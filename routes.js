@@ -9,6 +9,9 @@ const db = require('./db');
 
 const router = express.Router();
 
+router.route('/')
+  .get((req, res, next) => res.render('home'));
+
 router.route('/login')
   .get((req, res, next) => res.render('login'))
   .post(passport.authenticate('local', { failureRedirect: '/login', successRedirect: '/users'}));

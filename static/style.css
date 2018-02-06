@@ -4,7 +4,7 @@ body {
 
 #main {
   margin: 200px;
-  width: 250px;
+  width: 500px;
 }
 
 #header span, #header a {
@@ -38,4 +38,12 @@ table thead {
 
 table tbody tr:hover {
   background-color: #E8E8E8;
+}
+
+.pusheen-reading {
+  text-align: center;
+}
+
+.pusheen-reading img {
+  width: 250px;
 }
