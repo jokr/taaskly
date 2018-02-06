@@ -1,0 +1,10 @@
+html
+  head
+    title Pusheen Suite
+    link(href="/style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      include includes/header.pug
+      h1= document.name
+      p.meta Created by #{document.owner.username} #{moment(document.createdAt).fromNow()}
+      p= document.content

@@ -15,10 +15,12 @@
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "heroku-logger": "^0.3.0",
+    "moment": "^2.20.1",
     "morgan": "^1.9.0",
     "node-env-file": "^0.1.8",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "pg": "^7.4.1",
     "pug": "^2.0.0-rc.4",
     "sequelize": "^4.32.7"
   },

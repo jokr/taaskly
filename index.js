@@ -32,7 +32,14 @@ app.use(passport.session());
 
 morgan.token('uid', (req, res) => req.user ? req.user.id : null);
 app.use(morgan(':method :url :status :response-time ms :uid'));
+app.use((req, res, next) => {
+  if (req.user) {
+    res.locals.user = req.user;
+  }
+  next();
+})
 app.use(routes);
+app.locals.moment = require('moment');
 
 db
   .authenticate()

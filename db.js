@@ -25,29 +25,55 @@ if (process.env.DATABASE_URL) {
   );
 }
 
+const User = sequelize.define('user', {
+  username: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+    unique: true,
+  },
+  passwordHash: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+  },
+});
+
+const Document = sequelize.define('document', {
+  'name': {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+  },
+  'content': {
+    type: Sequelize.BLOB,
+    allowNull: false,
+  },
+  'privacy': {
+    type: Sequelize.ENUM('public', 'restricted'),
+    defaultValue: 'public',
+    allowNull: false,
+  },
+});
+
+Document.belongsTo(User, { as: 'owner',  foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
+
 const tables = [
-  sequelize.define('user', {
-    username: {
-      type: Sequelize.STRING,
-      validate: {
-        notEmpty: true,
-      },
-      allowNull: false,
-      unique: true,
-    },
-    passwordHash: {
-      type: Sequelize.STRING,
-      validate: {
-        notEmpty: true,
-      },
-      allowNull: false,
-    },
-  }),
+  User,
+  Document,
 ];
 
 let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() === 'true';
 
-Promise.all(tables.map(table => table.sync({force})))
-  .then(() => logger.info('Table sync complete.'));
+User.sync({force})
+  .then(() => Document.sync({force}))
+  .then(() => logger.info('Table sync complete.'))
+  .catch(err => logger.error(err));
 
 module.exports = sequelize;

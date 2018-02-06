@@ -1,0 +1,35 @@
+html
+  head
+    title Pusheen Suite
+    link(href="style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      include includes/header.pug
+      h1 All Documents
+      p.
+        A list of all documents.
+      p
+        a(href="/document/create") New Document
+      table.users
+        thead
+          tr
+            th ID
+            th Name
+            th Content
+            th Privacy
+        tbody
+          each document in documents
+            tr
+              td(style="width: 50px")
+                a(href="/document/" + document.id)= document.id
+              td
+                a(href="/document/" + document.id)= document.name
+              td
+                a(href="/document/" + document.id)
+                  - let content = document.content.toString()
+                  if content.length > 100
+                    = content.substring(0, 100) + ' ...'
+                  else
+                    = content
+              td(style="width: 100px")
+                a(href="/document/" + document.id)= document.privacy

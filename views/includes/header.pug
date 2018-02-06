@@ -1,7 +1,10 @@
 #header
   if user
     div
-      span #{user.username}
+      div.user= user.username
+      a(href="/users") Users
+      a(href="/documents") Documents
+    div
       a(href="/logout") Logout
   else
     div

@@ -1,0 +1,14 @@
+html
+  head
+    title Pusheen Suite
+    link(href="/style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      include includes/header.pug
+      h1 Create a New Document
+      form(action="/document/create" method="post")
+        label Name
+          input(type="text" name="name" required)
+        label Content
+          textarea(name="content")
+        button(type="submit") Create
