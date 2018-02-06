@@ -78,4 +78,9 @@ router.route('/document/:id')
     .catch(next),
   );
 
+router.use((err, req, res, next) => {
+  logger.error(err);
+  res.status(500).render('error', {message: err.message, details: err.stack});
+});
+
 module.exports = router;
