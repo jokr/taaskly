@@ -1,0 +1,9 @@
+#header
+  if user
+    div
+      span #{user.username}
+      a(href="/logout") Logout
+  else
+    div
+      a(href="/login") Login
+      a(href="/register") Register

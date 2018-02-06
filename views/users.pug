@@ -1,0 +1,20 @@
+html
+  head
+    title Github on Workplace
+    link(href="style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      include includes/header.pug
+      h1 All Users
+      p.
+        A list of all users.
+      table.users
+        thead
+          tr
+            th ID
+            th Name
+        tbody
+          each user in users
+            tr
+              td(style="width: 50px")= user.id
+              td= user.username

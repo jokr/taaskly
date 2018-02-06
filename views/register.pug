@@ -1,0 +1,13 @@
+html
+  head
+    title Pusheen Suite
+    link(href="style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      h1 Register
+      form(action="/register" method="post")
+        label Username
+          input(type="text" name="username" required)
+        label Password
+          input(type="password" name="password" required)
+        button(type="submit") Register

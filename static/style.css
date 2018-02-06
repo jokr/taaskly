@@ -1,0 +1,41 @@
+body {
+  font-family: sans-serif;
+}
+
+#main {
+  margin: 200px;
+  width: 250px;
+}
+
+#header span, #header a {
+  margin-right: 10px;
+}
+
+label {
+  margin-bottom: 10px;
+  display: block;
+}
+
+input {
+  margin-top: 2px;
+  width: 100%;
+  padding: 5px;
+}
+
+a {
+  color: #4080ff;
+  text-decoration: none;
+}
+
+table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+table thead {
+  text-align: left;
+}
+
+table tbody tr:hover {
+  background-color: #E8E8E8;
+}

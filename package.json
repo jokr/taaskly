@@ -10,11 +10,16 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
+    "express-session": "^1.15.6",
     "heroku-logger": "^0.3.0",
     "morgan": "^1.9.0",
     "node-env-file": "^0.1.8",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "pug": "^2.0.0-rc.4",
     "sequelize": "^4.32.7"
   },
   "repository": {

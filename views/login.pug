@@ -1,0 +1,16 @@
+html
+  head
+    title Pusheen Suite
+    link(href="style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      h1 Login
+      p Please enter your username and password.
+      form(action="/login" method="post")
+        label Username
+          input(type="text" name="username" required)
+        label Password
+          input(type="password" name="password" required)
+        button(type="submit") Login
+      p
+        a(href='/register') Not yet registered?
