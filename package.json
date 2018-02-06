@@ -1,0 +1,29 @@
+{
+  "name": "pusheen-suite",
+  "version": "0.0.1",
+  "description": "A sample app for Workplace demonstrating account linking, link previewing and composer integration.",
+  "engines": {
+    "node": "8.1.x"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "heroku-logger": "^0.3.0",
+    "morgan": "^1.9.0",
+    "node-env-file": "^0.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jokr/pusheen-suite.git"
+  },
+  "license": "MIT",
+  "author": "Joel Krebs <jokr@fb.com>",
+  "bugs": {
+    "url": "https://github.com/jokr/pusheen-suite/issues"
+  },
+  "homepage": "https://github.com/jokr/pusheen-suite#readme"
+}
