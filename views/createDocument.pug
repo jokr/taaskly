@@ -7,8 +7,16 @@ html
       include includes/header.pug
       h1 Create a New Document
       form(action="/document/create" method="post")
-        label Name
+        label.label Name
           input(type="text" name="name" required)
-        label Content
+        label.label Content
           textarea(name="content")
-        button(type="submit") Create
+        p.label Privacy
+        div
+          input(id="privacy-public" type="radio" name="privacy" value="public" checked)
+          label(for="privacy-public") Public
+        div
+          input(id="privacy-restricted" type="radio" name="privacy" value="restricted")
+          label(for="privacy-restricted") Restricted
+        p
+          button(type="submit") Create

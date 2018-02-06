@@ -66,7 +66,12 @@ router.route('/documents')
 router.route('/document/create')
   .get((req, res, next) => res.render('createDocument'))
   .post((req, res, next) => db.models.document
-    .create({name: req.body.name, content: req.body.content, ownerId: req.user.id})
+    .create({
+      name: req.body.name,
+      content: req.body.content,
+      privacy: req.body.privacy,
+      ownerId: req.user.id,
+    })
     .then(() => res.redirect('/documents'))
     .catch(next),
   );
