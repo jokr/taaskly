@@ -12,6 +12,7 @@ env(__dirname + '/.env', {raise: false});
 const db = require('./db');
 const passport = require('./passport');
 const routes = require('./routes');
+const xhub = require('./xhub');
 
 const app = express();
 app.set('port', (process.env.PORT || 5000));
@@ -19,6 +20,7 @@ app.set('view engine', 'pug');
 app.set('json spaces', 2);
 
 app.use(express.static('static'));
+app.use(bodyParser.json({ verify: xhub }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
   resave: false,
