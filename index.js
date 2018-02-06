@@ -8,6 +8,8 @@ const morgan = require('morgan');
 
 env(__dirname + '/.env', {raise: false});
 
+const db = require('./db');
+
 const app = express();
 app.set('port', (process.env.PORT || 5000));
 app.set('view engine', 'pug');
@@ -17,6 +19,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(morgan(':method :url :status :response-time ms'));
 
-app.listen(app.get('port'), () => {
-  logger.info(`App is running on port ${app.get('port')}.`);
-});
+db
+  .authenticate()
+  .then(() => {
+    logger.info('Connected to database.');
+    app.listen(app.get('port'), () => {
+      logger.info(`App is running on port ${app.get('port')}.`);
+    });
+  });

@@ -14,7 +14,8 @@
     "express": "^4.16.2",
     "heroku-logger": "^0.3.0",
     "morgan": "^1.9.0",
-    "node-env-file": "^0.1.8"
+    "node-env-file": "^0.1.8",
+    "sequelize": "^4.32.7"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/jokr/pusheen-suite/issues"
   },
-  "homepage": "https://github.com/jokr/pusheen-suite#readme"
+  "homepage": "https://github.com/jokr/pusheen-suite#readme",
+  "devDependencies": {
+    "sqlite": "^2.9.1"
+  }
 }
