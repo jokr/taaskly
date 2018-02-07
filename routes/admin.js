@@ -38,4 +38,17 @@ router.route('/communities')
     .catch(next),
   );
 
+router.route('/callbacks')
+  .get((req, res, next) => db.models.callback
+    .findAll({order: [['createdAt', 'DESC']]})
+    .then(callbacks => res.render('callbacks', {callbacks}))
+    .catch(next),
+  );
+
+router.route('/delete_callbacks')
+  .post((req, res, next) => db.models.callback
+    .destroy({truncate: true})
+    .then(() => res.redirect('/admin/callbacks')),
+  );
+
 module.exports = router;

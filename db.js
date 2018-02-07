@@ -83,12 +83,26 @@ const Community = sequelize.define('community', {
   }
 });
 
+const Callback = sequelize.define('callback', {
+  headers: {
+    type: Sequelize.JSON,
+    allowNull: false,
+  },
+  body: {
+    type: Sequelize.JSON,
+    allowNull: false,
+  }},
+  {
+    updatedAt: false,
+  },
+);
+
 Document.belongsTo(User, { as: 'owner',  foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
 User.belongsTo(Community);
 
 let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() === 'true';
 
-Community.sync({force})
+Promise.all([Community.sync({force}), Callback.sync({force})])
   .then(() => User.sync({force}))
   .then(() => Document.sync({force}))
   .then(() => logger.info('Table sync complete.'))

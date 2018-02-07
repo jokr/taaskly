@@ -5,6 +5,8 @@ const crypto = require('crypto');
 const express = require('express');
 const logger = require('heroku-logger');
 
+const db = require('../db');
+
 const router = express.Router();
 
 function errorHandler(err, req, res, next) {
@@ -44,6 +46,8 @@ router.route('/unfurl_callback')
     return res.send(params['hub.challenge']);
   })
   .post((req, res, next) => {
+    db.models.callback.create({ headers: req.headers, body: req.body }).then();
+
     if (!req.xhub) {
       logger.warn('missing x-hub-signature');
       return res.status(400).send('Invalid x-hub-signature.');
