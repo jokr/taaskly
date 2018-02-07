@@ -31,4 +31,11 @@ router.route('/subscribe')
     .catch(next),
   );
 
+router.route('/communities')
+  .get((req, res, next) => db.models.community
+    .findAll({order: [['name', 'ASC']]})
+    .then(communities => res.render('communities', {communities}))
+    .catch(next),
+  );
+
 module.exports = router;

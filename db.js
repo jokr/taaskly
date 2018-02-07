@@ -62,16 +62,34 @@ const Document = sequelize.define('document', {
   },
 });
 
-Document.belongsTo(User, { as: 'owner',  foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
+const Community = sequelize.define('community', {
+  id: {
+    type: Sequelize.BIGINT,
+    primaryKey: true,
+  },
+  name: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+  },
+  accessToken: {
+    type: Sequelize.STRING(510),
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+  }
+});
 
-const tables = [
-  User,
-  Document,
-];
+Document.belongsTo(User, { as: 'owner',  foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
+User.belongsTo(Community);
 
 let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() === 'true';
 
-User.sync({force})
+Community.sync({force})
+  .then(() => User.sync({force}))
   .then(() => Document.sync({force}))
   .then(() => logger.info('Table sync complete.'))
   .catch(err => logger.error(err));

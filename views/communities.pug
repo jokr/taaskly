@@ -1,0 +1,25 @@
+html
+  head
+    title Pusheen Suite
+    link(href="/favicon.ico" rel="icon" type="image/x-icon")
+    link(href="/style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      include includes/header.pug
+      h1 All Communities
+      p.
+        A list of all communities.
+      table.communities
+        thead
+          tr
+            th(style="width: 200px") Workplace ID
+            th Name
+            th Created Time
+            th Access Token
+        tbody
+          each community in communities
+            tr
+              td= community.id
+              td= community.name
+              td= moment(community.createdAt).fromNow()
+              td= community.accessToken.substring(0, 5) + '...'
