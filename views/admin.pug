@@ -1,0 +1,29 @@
+html
+  head
+    title Pusheen Suite
+    link(href="/favicon.ico" rel="icon" type="image/x-icon")
+    link(href="/style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      include includes/header.pug
+      h1 Admin Panel
+      p.
+        Various information about the current status of the application.
+      h2 Webhook Subscriptions
+      form(action="/admin/subscribe" method="post")
+        button(type="submit") Subscribe
+      if subscriptions.length === 0
+        p No active webhook subscriptions.
+      else
+        table
+          thead
+            tr
+              th Topic
+              th Fields
+              th Callback URL
+          tbody
+          each subscription in subscriptions
+            tr
+              td= subscription.object
+              td= subscription.fields.map(f => f.name).join(', ')
+              td= subscription.callback_url

@@ -5,6 +5,7 @@ const express = require('express');
 const logger = require('heroku-logger');
 const passport = require('passport');
 
+const admin = require('./admin');
 const api = require('./api');
 const authenticated = require('./authenticated');
 const db = require('../db');
@@ -27,6 +28,7 @@ const router = express.Router();
 
 router.use(loggedout);
 router.use('/api', api);
+router.use('/admin', admin);
 router.use(loginRedirect);
 router.use(authenticated);
 router.use(errorHandler);
