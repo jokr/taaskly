@@ -11,10 +11,12 @@ html
       table.users
         thead
           tr
-            th ID
+            th(style="width: 50px") ID
+            th(style="width: 200px") Workplace ID
             th Name
         tbody
           each user in users
             tr
-              td(style="width: 50px")= user.id
+              td= user.id
+              td= user.workplaceID
               td= user.username

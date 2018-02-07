@@ -78,23 +78,25 @@ router.route('/unfurl_callback')
 
     Promise.all([
         db.models.document.findById(parseInt(regexMatch[1])),
-        db.models.community.findById(parseInt(change.community.id))
+        db.models.community.findById(parseInt(change.community.id)),
+        db.models.user.findOne({where: {workplaceID: change.user.id}}),
       ])
       .then(results => {
-        const document = results[0];
-        if (document === null) {
+        const doc = results[0];
+        if (doc === null) {
           return res.status(404).send('No document with this id exists.');
         }
         const community = results[1];
         if (community === null) {
           return res.status(400).send('Unknown community.');
         }
-        if (document.privacy !== 'public') {
+        const user = results[2];
+        if (doc.privacy !== 'public' && doc.ownerId !== user.id) {
           return res
             .status(200)
             .json({
               data: [],
-              linked_user: false,
+              linked_user: user !== null,
             });
         }
         return res
@@ -102,11 +104,11 @@ router.route('/unfurl_callback')
           .json({
             data: [{
               link: change.link,
-              title: document.name,
-              privacy: 'organization',
+              title: doc.name,
+              privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
               type: 'document',
             }],
-            linked_user: false,
+            linked_user: user !== null,
           });
       })
       .catch(next);

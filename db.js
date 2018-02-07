@@ -41,6 +41,11 @@ const User = sequelize.define('user', {
     },
     allowNull: false,
   },
+  workplaceID: {
+    type: Sequelize.BIGINT,
+    allowNull: true,
+    unique: true,
+  },
 });
 
 const Document = sequelize.define('document', {
