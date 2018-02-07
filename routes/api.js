@@ -46,7 +46,10 @@ router.route('/unfurl_callback')
     return res.send(params['hub.challenge']);
   })
   .post((req, res, next) => {
-    db.models.callback.create({ headers: req.headers, body: req.body }).then();
+    db.models.callback
+      .create({ headers: req.headers, body: req.body })
+      .then()
+      .catch(error => logger.warn(error));
 
     if (!req.xhub) {
       logger.warn('missing x-hub-signature');
@@ -68,12 +71,45 @@ router.route('/unfurl_callback')
     }
     const change = req.body.entry[0].changes[0].value;
 
-    return res
-      .status(200)
-      .json({
-        data : [],
-        linked_user: false,
-      });
+    const regexMatch = change.link.match(/^https:\/\/pusheen-suite\.herokuapp\.com\/document\/([0-9]+)/);
+    if (regexMatch === null || regexMatch.length !== 2) {
+      return res.status(400).send('Unknown document link');
+    }
+
+    Promise.all([
+        db.models.document.findById(parseInt(regexMatch[1])),
+        db.models.community.findById(parseInt(change.community.id))
+      ])
+      .then(results => {
+        const document = results[0];
+        if (document === null) {
+          return res.status(404).send('No document with this id exists.');
+        }
+        const community = results[1];
+        if (community === null) {
+          return res.status(400).send('Unknown community.');
+        }
+        if (document.privacy !== 'public') {
+          return res
+            .status(200)
+            .json({
+              data: [],
+              linked_user: false,
+            });
+        }
+        return res
+          .status(200)
+          .json({
+            data: [{
+              link: change.link,
+              title: document.name,
+              privacy: 'organization',
+              type: 'document',
+            }],
+            linked_user: false,
+          });
+      })
+      .catch(next);
   });
 
 router.use('*', (req, res, next) => res.status(404).send());
