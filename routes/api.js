@@ -36,10 +36,17 @@ router.use(bodyParser.json({ verify: xhub }));
 
 router.route('/webhook')
   .get((req, res, next) => {
-    res.status(200).send();
+    let params = req.query;
+    if (!params['hub.mode'] || !params// ['hub.challenge'] || !params['hub.verify_token']) {
+//       return res.status(400).send('Invalid verification request.');
+//     }
+//     if (params['hub.verify_token'] !== process.env.VERIFY_TOKEN) {
+//       return res.status(400).send('Invalid verify token.');
+//     }
+    return res.send(params['hub.challenge']);
   })
   .post((req, res, next) => {
-    res.status(200).send();
+    res.status(200).send("OK");
   });
 
 router.route('/unfurl_callback')
