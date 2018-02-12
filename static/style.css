@@ -2,8 +2,10 @@ body {
   font-family: sans-serif;
 }
 
-#main {
-  margin: 200px;
+@media (min-width: 1000px) {
+  #main {
+    margin: 200px;
+  }
 }
 
 #header {

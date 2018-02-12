@@ -1,0 +1,12 @@
+html
+  head
+    title Pusheen Suite
+    link(href="/favicon.ico" rel="icon" type="image/x-icon")
+    link(href="/style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      include includes/header.pug
+      h1 Account Linked
+      p.
+        Your Pusheen Suite account #{user.username} was successfully linked to the 
+        Workplace user id #{user.workplaceID}.
