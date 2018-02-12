@@ -90,7 +90,7 @@ router.route('/link_account')
         .status(400)
         .render('error', {message: `Signed request is malformatted: ${req.body.signed_request}`});
     }
-    const [signature, payload] = parts.map(base64url.decode);
+    const [signature, payload] = parts.map(value => base64url.decode(value));
     const expectedSignature = crypto.createHmac('sha256', process.env.APP_SECRET)
       .update(parts[1])
       .digest('hex');
