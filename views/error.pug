@@ -5,7 +5,10 @@ html
     link(href="/style.css", rel="stylesheet", type="text/css")
   body
     #main
-      h1 Oh no, an error occurred
+      if header
+        h1= header
+      else
+        h1 Oh no, an error occurred
       p=message
       pre=details
       p.pusheen

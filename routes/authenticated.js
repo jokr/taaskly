@@ -2,6 +2,7 @@
 
 const express = require('express');
 const logger = require('heroku-logger');
+const Op = require('sequelize').Op;
 
 const db = require('../db');
 
@@ -21,7 +22,12 @@ router.route('/users')
 
 router.route('/documents')
   .get((req, res, next) => db.models.document
-    .findAll({order: [['updatedAt', 'DESC']]})
+    .findAll({
+      where: {
+        [Op.or]: [{ownerId: req.user.id}, {privacy: 'public'}],
+      },
+      order: [['updatedAt', 'DESC']]
+    })
     .then(documents => res.render('documents', {documents}))
     .catch(next),
   );
@@ -42,7 +48,31 @@ router.route('/document/create')
 router.route('/document/:id')
   .get((req, res, next) => db.models.document
     .findById(req.params.id, {include: [{model: db.models.user, as: 'owner'}]})
-    .then(document => res.render('document', {document}))
+    .then(document => {
+      if (!document) {
+        return res
+          .status(404)
+          .render(
+            'error',
+            {
+              header: 'Document does not exist',
+              message: 'The document you requested does not seem to exist.',
+            },
+          );
+      }
+      if (document.privacy === 'restricted' && req.user.id !== document.owner.id) {
+        return res
+          .status(403)
+          .render(
+            'error',
+            {
+              header: 'Document is private',
+              message: 'This document is private.',
+            },
+          );
+      }
+      return res.render('document', {document});
+    })
     .catch(next),
   );
 
