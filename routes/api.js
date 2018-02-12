@@ -35,6 +35,9 @@ function xhub(req, res, buf, encoding) {
 router.use(bodyParser.json({ verify: xhub }));
 
 router.route('/webhook')
+  .get((req, res, next) => {
+    res.status(200).send();
+  })
   .post((req, res, next) => {
     res.status(200).send();
   });
