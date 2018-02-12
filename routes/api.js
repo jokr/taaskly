@@ -34,6 +34,11 @@ function xhub(req, res, buf, encoding) {
 
 router.use(bodyParser.json({ verify: xhub }));
 
+router.route('/webhook')
+  .post((req, res, next) => {
+    res.status(200).send();
+  });
+
 router.route('/unfurl_callback')
   .get((req, res, next) => {
     let params = req.query;
