@@ -1,6 +1,6 @@
 {
   "name": "Pusheen Suite",
-  "description": "This app does.",
+  "description": "This app does everything.",
   "keywords": [
     "workplace",
     "pusheen",
@@ -41,7 +41,7 @@
     "SALT_ROUNDS": {
       "description": "Number of bcrypt rounds.",
       "value": "10"
-    },
+    }
   },
   "formation": {
     "web": {
@@ -49,7 +49,7 @@
       "size": "free"
     }
   },
-  "image": "heroku/nodejs"
+  "image": "heroku/nodejs",
   "addons": [
     {
       "plan": "heroku-postgresql:hobby-dev"
