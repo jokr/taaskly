@@ -8,17 +8,18 @@ const db = require('../db');
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+  res.locals.navigation = [
+    {name: 'Documents', path: '/documents'},
+  ];
+  next();
+});
+
 router.route('/logout')
   .get((req, res, next) => {
     req.logout();
     res.redirect('/');
   });
-
-router.route('/users')
-  .get((req, res, next) => db.models.user
-    .findAll({order: [['createdAt', 'DESC']]})
-    .then(users => res.render('users', {users})),
-  );
 
 router.route('/documents')
   .get((req, res, next) => db.models.document

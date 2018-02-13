@@ -17,7 +17,14 @@ router.route('/')
 
 router.route('/login')
   .get((req, res, next) => res.render('login'))
-  .post(passport.authenticate('local', { failureRedirect: '/login', successRedirect: '/users'}));
+  .post(
+    passport.authenticate('local', { failureRedirect: '/login' }),
+    (req, res, next) => {
+      const referrer = req.session.loginReferrer || '/documents';
+      delete req.session.loginReferrer;
+      return res.redirect(referrer);
+    },
+  );
 
 router.route('/register')
   .get((req, res, next) => res.render('register'))
