@@ -9,6 +9,8 @@ const db = require('../db');
 
 const router = express.Router();
 
+const validate = process.env.npm_config_production == 'true';
+
 function errorHandler(err, req, res, next) {
   logger.error(err);
   res.status(500).json({message: err.message, details: err.stack});
@@ -56,14 +58,14 @@ router.route('/webhook')
   .get(processChallenge)
   .post((req, res, next) => {
 	console.log(req.body);
-	
+
     logCallback(req);
 
-    if (!req.xhub) {
+    if (validate && !req.xhub) {
       logger.warn('missing x-hub-signature');
       return res.status(400).send('Invalid x-hub-signature.');
     }
-    
+
     return res.status(200).send("OK");
   });
 
@@ -72,7 +74,7 @@ router.route('/unfurl_callback')
   .post((req, res, next) => {
     logCallback(req);
 
-    if (!req.xhub) {
+    if (validate && !req.xhub) {
       logger.warn('missing x-hub-signature');
       return res.status(400).send('Invalid x-hub-signature.');
     }
