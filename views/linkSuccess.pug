@@ -6,9 +6,9 @@ html
   body
     #main
       include includes/header.pug
-      h1 Pusheen Suite
+      h1 Account Linked
       p.
-        A Workplace application demonstrating account linking, file preview and composer integration. This models
-        a simple document store with very simple privacy rules.
+        Your Pusheen Suite account #{user.username} was successfully linked to the 
+        Workplace user id #{user.workplaceID}.
       p.pusheen
-        img(src='/reading.png')
+        img(src='/unicorn.png')

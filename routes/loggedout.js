@@ -90,7 +90,7 @@ router.route('/link_account')
         .status(400)
         .render('error', {message: `Signed request is malformatted: ${req.body.signed_request}`});
     }
-    const [signature, payload] = parts.map(base64url.decode);
+    const [signature, payload] = parts.map(value => base64url.decode(value));
     const expectedSignature = crypto.createHmac('sha256', process.env.APP_SECRET)
       .update(parts[1])
       .digest('hex');
@@ -104,8 +104,8 @@ router.route('/link_account')
     }
     const decodedPayload = JSON.parse(payload);
     Promise.all([
-      db.models.findById(decodedPayload.community_id),
-      db.models.findOne({where: {workplaceID: decodedPayload.user_id}}),
+      db.models.community.findById(decodedPayload.community_id),
+      db.models.user.findOne({where: {workplaceID: decodedPayload.user_id}}),
     ]).then(results => {
       const [community, user] = results;
       if (!community) {
@@ -125,11 +125,13 @@ router.route('/link_account')
           );
       }
       if (req.user) {
-        return req.user.set('workplaceID', decodedPayload.user_id);
+        return req.user
+          .set('workplaceID', decodedPayload.user_id)
+          .save()
+          .then(user => res.render('linkSuccess'));
       }
-    }).then(user => {
-      return res.render('linkSuccess');
-    });
+    })
+    .catch(next);
   });
 
 module.exports = router;
