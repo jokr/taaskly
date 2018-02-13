@@ -10,9 +10,6 @@
   "repository": "https://github.com/jokr/pusheen-suite",
   "logo": "http://thecraftchop.com/files/others/pusheen.svg",
   "success_url": "/",
-  "scripts": {
-    "postdeploy": "bundle exec rake bootstrap"
-  },
   "env": {
     "APP_ID": {
       "description": "App ID from custom integration.",
