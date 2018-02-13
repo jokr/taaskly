@@ -27,10 +27,6 @@
       "description": "todo",
       "value": "UNSET"
     },
-    "DATABASE_URL": {
-      "description": "A database url to connect to.",
-      "value": "postgres://UNSET"
-    },
     "WEBHOOK_CALLBACK": {
       "description": "todo",
       "value": "UNSET"
