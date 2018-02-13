@@ -1,0 +1,51 @@
+{
+  "name": "Pusheen Suite",
+  "description": "This app does everything.",
+  "keywords": [
+    "workplace",
+    "pusheen",
+    "node"
+  ],
+  "website": "https://github.com/jokr/pusheen-suite",
+  "repository": "https://github.com/jokr/pusheen-suite",
+  "logo": "http://thecraftchop.com/files/others/pusheen.svg",
+  "success_url": "/",
+  "env": {
+    "APP_ID": {
+      "description": "App ID from custom integration.",
+      "value": "UNSET"
+    },
+    "APP_SECRET": {
+      "description": "App Secret from custom integration.",
+      "value": "UNSET"
+    },
+    "APP_REDIRECT": {
+      "description": "todo",
+      "value": "UNSET"
+    },
+    "SESSION_SECRET": {
+      "description": "todo",
+      "value": "UNSET"
+    },
+    "WEBHOOK_CALLBACK": {
+      "description": "todo",
+      "value": "UNSET"
+    },
+    "SALT_ROUNDS": {
+      "description": "Number of bcrypt rounds.",
+      "value": "10"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "image": "heroku/nodejs",
+  "addons": [
+    {
+      "plan": "heroku-postgresql:hobby-dev"
+    }
+  ]
+}

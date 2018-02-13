@@ -8,6 +8,15 @@ const graph = require('../graph');
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+  res.locals.navigation = [
+    {name: 'Users', path: '/admin/users'},
+    {name: 'Communities', path: '/admin/communities'},
+    {name: 'Callbacks', path: '/admin/callbacks'},
+  ];
+  next();
+});
+
 router.route('/')
   .get((req, res, next) => graph('app/subscriptions')
     .appSecret()
@@ -36,6 +45,12 @@ router.route('/communities')
     .findAll({order: [['name', 'ASC']]})
     .then(communities => res.render('communities', {communities}))
     .catch(next),
+  );
+
+router.route('/users')
+  .get((req, res, next) => db.models.user
+    .findAll({order: [['createdAt', 'DESC']]})
+    .then(users => res.render('users', {users})),
   );
 
 router.route('/callbacks')

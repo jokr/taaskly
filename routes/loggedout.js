@@ -17,7 +17,17 @@ router.route('/')
 
 router.route('/login')
   .get((req, res, next) => res.render('login'))
-  .post(passport.authenticate('local', { failureRedirect: '/login', successRedirect: '/users'}));
+  .post(
+    passport.authenticate('local', { failureRedirect: '/login' }),
+    (req, res, next) => {
+      if (req.session.signedRequest) {
+        return res.redirect('/link_account_confirm');
+      }
+      const referrer = req.session.loginReferrer || '/documents';
+      delete req.session.loginReferrer;
+      return res.redirect(referrer);
+    },
+  );
 
 router.route('/register')
   .get((req, res, next) => res.render('register'))
@@ -84,6 +94,11 @@ router.route('/link_account')
         .status(400)
         .render('error', {message: `No signed request sent.`});
     }
+    if (!req.query.redirect_uri) {
+      return res
+        .status(400)
+        .render('error', {message: `No redirect uri parameter sent.`});
+    }
     const parts = req.body.signed_request.split('.');
     if (parts.length !== 2) {
       return res
@@ -103,35 +118,12 @@ router.route('/link_account')
         );
     }
     const decodedPayload = JSON.parse(payload);
-    Promise.all([
-      db.models.community.findById(decodedPayload.community_id),
-      db.models.user.findOne({where: {workplaceID: decodedPayload.user_id}}),
-    ]).then(results => {
-      const [community, user] = results;
-      if (!community) {
-        return res
-          .status(400)
-          .render(
-            'error',
-            {message: `No community with id ${decodedPayload.community_id} found`},
-          );
-      }
-      if (user && user.id !== req.user.id) {
-        return res
-          .status(400)
-          .render(
-            'error',
-            {message: `This user is already linked to somebody else.`},
-          );
-      }
-      if (req.user) {
-        return req.user
-          .set('workplaceID', decodedPayload.user_id)
-          .save()
-          .then(user => res.render('linkSuccess'));
-      }
-    })
-    .catch(next);
+    decodedPayload.redirect = req.query.redirect_uri;
+    req.session.signedRequest = decodedPayload;
+    if (!req.user) {
+      return res.redirect('/login');
+    }
+    return res.redirect('link_account_confirm');
   });
 
 module.exports = router;

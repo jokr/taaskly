@@ -1,0 +1,13 @@
+html
+  head
+    title Pusheen Suite
+    link(href="/favicon.ico" rel="icon" type="image/x-icon")
+    link(href="/style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      h1 Link Account with #{community.name}
+      p.
+        Would you link your Pusheen Suite Account #{user.username} with the
+        Workplace community #{community.name}?
+      form(action="/link_account_confirm" method="post")
+        button(type="submit").confirm Link Account

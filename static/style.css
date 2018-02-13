@@ -13,12 +13,30 @@ body {
   justify-content: space-between;
 }
 
-#header span, #header a {
-  margin-right: 10px;
+#header ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-#header .user {
-  margin-bottom: 8px;
+#header li a, #header li.user {
+  display: block;
+  padding: 4px;
+  width: 110px;
+}
+
+#header .nav-item:hover {
+  background-color: #4080ff;
+}
+
+#header .nav-item:hover a {
+  font-weight: bold;
+  color: white;
+}
+
+nav li:hover a {
+  color: white;
 }
 
 form.small {
