@@ -9,11 +9,25 @@ const db = require('../db');
 
 const router = express.Router();
 
-const validate = process.env.npm_config_production == 'true';
+const validate = process.env.NODE_ENV === 'true';
+
+class BadRequest extends Error {
+  constructor(message) {
+    super();
+    this.name = "BadRequest";
+    this.message = (message || "");
+    Error.captureStackTrace(this);
+  }
+}
 
 function errorHandler(err, req, res, next) {
   logger.error(err);
-  res.status(500).json({message: err.message, details: err.stack});
+
+  if (err instanceof BadRequest) {
+    res.status(400).json({message: err.message, details: err.stack});
+  } else {
+    res.status(500).json({message: err.message, details: err.stack});
+  }
 }
 
 function xhub(req, res, buf, encoding) {
@@ -37,66 +51,77 @@ function xhub(req, res, buf, encoding) {
 function processChallenge(req, res, next) {
   let params = req.query;
   if (!params['hub.mode'] || !params['hub.challenge'] || !params['hub.verify_token']) {
-    return res.status(400).send('Invalid verification request.');
+    throw new BadRequest('Invalid verification request.');
   }
   if (params['hub.verify_token'] !== process.env.VERIFY_TOKEN) {
-    return res.status(400).send('Invalid verify token.');
+    throw new BadRequest('Invalid verify token.');
   }
   return res.status(200).send(params['hub.challenge']);
 }
 
-function logCallback(req) {
+function logAndValidateCallback(req) {
+  console.log(req.body);
   db.models.callback
     .create({ path: req.originalUrl, headers: req.headers, body: req.body })
     .then()
     .catch(error => logger.warn(error));
+  if (validate && !req.xhub) {
+    logger.warn('missing x-hub-signature');
+    throw new BadRequest('Invalid x-hub-signature.');
+  }
 }
 
 router.use(bodyParser.json({ verify: xhub }));
 
+function readMessaging(body) {
+  if (body.entry.length !== 1) {
+    logger.warn(`expected exactly one entry, got ${body.entry.length}`);
+    throw new BadRequest('Malformatted request.');
+  }
+  if (body.entry[0].messaging.length !== 1) {
+    logger.warn(`expected exactly one change, got ${body.entry.messaging.length}`);
+    throw new BadRequest('Malformatted request.');
+  }
+  return body.entry[0].messaging[0].value;
+}
+
 router.route('/webhook')
   .get(processChallenge)
   .post((req, res, next) => {
-	console.log(req.body);
+    logAndValidateCallback(req);
 
-    logCallback(req);
-
-    if (validate && !req.xhub) {
-      logger.warn('missing x-hub-signature');
-      return res.status(400).send('Invalid x-hub-signature.');
-    }
+    const messaging = readMessaging(req.body);
 
     return res.status(200).send("OK");
   });
 
+function readChange(body) {
+    if (body.entry.length !== 1) {
+      logger.warn(`expected exactly one entry, got ${body.entry.length}`);
+      throw new BadRequest('Malformatted request.');
+    }
+    if (body.entry[0].changes.length !== 1) {
+      logger.warn(`expected exactly one change, got ${body.entry.changes.length}`);
+      throw new BadRequest('Malformatted request.');
+    }
+    return body.entry[0].changes[0].value;
+}
+
 router.route('/unfurl_callback')
   .get(processChallenge)
   .post((req, res, next) => {
-    logCallback(req);
+    logAndValidateCallback(req);
 
-    if (validate && !req.xhub) {
-      logger.warn('missing x-hub-signature');
-      return res.status(400).send('Invalid x-hub-signature.');
-    }
     if (req.body.object !== 'link') {
       logger.warn('Received invalid link webhook', req.body);
-      return res.status(400).send('Invalid topic.');
+      throw new BadRequest('Invalid topic.');
     }
 
-    if (req.body.entry.length !== 1) {
-      logger.warn(`expected exactly one entry, got ${req.body.entry.length}`);
-      return res.status(400).send('Malformatted request.');
-    }
-
-    if (req.body.entry[0].changes.length !== 1) {
-      logger.warn(`expected exactly one change, got ${entry.changes.length}`);
-      return res.status(400).send('Malformatted request.');
-    }
-    const change = req.body.entry[0].changes[0].value;
+    const change = readChange(req.body);
 
     const regexMatch = change.link.match(/^https:\/\/pusheen-suite\.herokuapp\.com\/document\/([0-9]+)/);
     if (regexMatch === null || regexMatch.length !== 2) {
-      return res.status(400).send('Unknown document link');
+      throw new BadRequest('Unknown document link');
     }
 
     Promise.all([

@@ -41,7 +41,7 @@ class GraphRequest {
   send() {
     let options = {
       method: this.method || 'GET',
-      uri: `${baseURL}/v2.10/${this.path}`,
+      uri: `${baseURL}/v2.11/${this.path}`,
       qs: Object.assign(this._calcProof(), this.queryString || {}),
       json: true,
       resolveWithFullResponse: true,
