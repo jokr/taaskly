@@ -77,4 +77,54 @@ router.route('/document/:id')
     .catch(next),
   );
 
+router.route('/link_account_confirm')
+  .get((req, res ,next) => {
+    const signedRequest = req.session.signedRequest;
+    if (!signedRequest) {
+      return res
+        .status(400)
+        .render('error', {message: 'No saved signed request.'});
+    }
+    Promise.all([
+      db.models.community.findById(signedRequest.community_id),
+      db.models.user.findOne({where: {workplaceID: signedRequest.user_id}}),
+    ])
+    .then(results => {
+      const [community, user] = results;
+      if (!community) {
+        return res
+          .status(400)
+          .render(
+            'error',
+            {message: `No community with id ${signedRequest.community_id} found`},
+          );
+      }
+      if (user && user.id !== req.user.id) {
+        return res
+          .status(400)
+          .render(
+            'error',
+            {message: `This user is already linked to somebody else.`},
+          );
+      }
+      return res.render('linkAccount', {community});
+    })
+    .catch(next);
+  })
+  .post((req, res, next) => {
+    const signedRequest = req.session.signedRequest;
+    Promise.all([
+      db.models.community.findById(signedRequest.community_id),
+      db.models.user.findOne({where: {workplaceID: signedRequest.user_id}}),
+    ]).then(results => {
+      const [community, user] = results;
+      delete req.session.signedRequest;
+      return req.user
+        .set('workplaceID', signedRequest.user_id)
+        .save()
+        .then(user => res.render('linkSuccess'));
+    })
+    .catch(next);
+  });
+
 module.exports = router;
