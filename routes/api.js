@@ -32,39 +32,45 @@ function xhub(req, res, buf, encoding) {
   req.xhub = true;
 }
 
+function processChallenge(req, res, next) {
+  let params = req.query;
+  if (!params['hub.mode'] || !params['hub.challenge'] || !params['hub.verify_token']) {
+    return res.status(400).send('Invalid verification request.');
+  }
+  if (params['hub.verify_token'] !== process.env.VERIFY_TOKEN) {
+    return res.status(400).send('Invalid verify token.');
+  }
+  return res.status(200).send(params['hub.challenge']);
+}
+
+function logCallback(req) {
+  db.models.callback
+    .create({ path: req.originalUrl, headers: req.headers, body: req.body })
+    .then()
+    .catch(error => logger.warn(error));
+}
+
 router.use(bodyParser.json({ verify: xhub }));
 
 router.route('/webhook')
-  .get((req, res, next) => {
-    let params = req.query;
-//     if (!params['hub.mode'] || !params// ['hub.challenge'] || !params['hub.verify_token']) {
-//       return res.status(400).send('Invalid verification request.');
-//     }
-//     if (params['hub.verify_token'] !== process.env.VERIFY_TOKEN) {
-//       return res.status(400).send('Invalid verify token.');
-//     }
-    return res.status(200).send(params['hub.challenge']);
-  })
+  .get(processChallenge)
   .post((req, res, next) => {
+	console.log(req.body);
+	
+    logCallback(req);
+
+    if (!req.xhub) {
+      logger.warn('missing x-hub-signature');
+      return res.status(400).send('Invalid x-hub-signature.');
+    }
+    
     return res.status(200).send("OK");
   });
 
 router.route('/unfurl_callback')
-  .get((req, res, next) => {
-    let params = req.query;
-    if (!params['hub.mode'] || !params['hub.challenge'] || !params['hub.verify_token']) {
-      return res.status(400).send('Invalid verification request.');
-    }
-    if (params['hub.verify_token'] !== process.env.VERIFY_TOKEN) {
-      return res.status(400).send('Invalid verify token.');
-    }
-    return res.send(params['hub.challenge']);
-  })
+  .get(processChallenge)
   .post((req, res, next) => {
-    db.models.callback
-      .create({ headers: req.headers, body: req.body })
-      .then()
-      .catch(error => logger.warn(error));
+    logCallback(req);
 
     if (!req.xhub) {
       logger.warn('missing x-hub-signature');

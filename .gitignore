@@ -7,5 +7,3 @@ npm-debug.log
 *.dev
 .DS_Store
 
-# secrets
-.env
