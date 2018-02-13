@@ -94,6 +94,11 @@ router.route('/link_account')
         .status(400)
         .render('error', {message: `No signed request sent.`});
     }
+    if (!req.query.redirect_uri) {
+      return res
+        .status(400)
+        .render('error', {message: `No redirect uri parameter sent.`});
+    }
     const parts = req.body.signed_request.split('.');
     if (parts.length !== 2) {
       return res
@@ -113,6 +118,7 @@ router.route('/link_account')
         );
     }
     const decodedPayload = JSON.parse(payload);
+    decodedPayload.redirect = req.query.redirect_uri;
     req.session.signedRequest = decodedPayload;
     if (!req.user) {
       return res.redirect('/login');

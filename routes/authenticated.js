@@ -118,11 +118,12 @@ router.route('/link_account_confirm')
       db.models.user.findOne({where: {workplaceID: signedRequest.user_id}}),
     ]).then(results => {
       const [community, user] = results;
+      const redirect = signedRequest.redirect;
       delete req.session.signedRequest;
       return req.user
         .set('workplaceID', signedRequest.user_id)
         .save()
-        .then(user => res.render('linkSuccess'));
+        .then(user => res.render('linkSuccess', {redirect}));
     })
     .catch(next);
   });
