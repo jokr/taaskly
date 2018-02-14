@@ -164,6 +164,7 @@ router.route('/unfurl_callback')
               data: [{
                 link: change.link,
                 title: doc.name,
+                description: doc.content.toString().substring(0, 200),
                 privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
                 type: 'document',
               }],
