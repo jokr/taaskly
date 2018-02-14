@@ -23,6 +23,10 @@
       "description": "todo",
       "value": "UNSET"
     },
+    "ACCESS_TOKEN": {
+      "description": "Fixed access token for custom integrations, unset for 3rd party Apps",
+      "required": false,
+    },
     "SESSION_SECRET": {
       "description": "todo",
       "value": "UNSET"

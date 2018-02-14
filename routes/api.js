@@ -6,6 +6,7 @@ const express = require('express');
 const logger = require('heroku-logger');
 
 const db = require('../db');
+const messages = require('../messages');
 
 const router = express.Router();
 
@@ -60,7 +61,6 @@ function processChallenge(req, res, next) {
 }
 
 function logAndValidateCallback(req) {
-  console.log(req.body);
   db.models.callback
     .create({ path: req.originalUrl, headers: req.headers, body: req.body })
     .then()
@@ -82,7 +82,8 @@ function readMessaging(body) {
     logger.warn(`expected exactly one change, got ${body.entry.messaging.length}`);
     throw new BadRequest('Malformatted request.');
   }
-  return body.entry[0].messaging[0].value;
+
+  return body.entry[0].messaging[0];
 }
 
 router.route('/webhook')
@@ -90,7 +91,17 @@ router.route('/webhook')
   .post((req, res, next) => {
     logAndValidateCallback(req);
 
+    // TODO should handle batching of entries
+
     const messaging = readMessaging(req.body);
+
+    console.log(messaging);
+
+    if (messaging.message) {
+      // t_xxxxx for threads
+      const target = messaging.thread ? messaging.thread.id : messaging.sender.id;
+      messages.postMessage(target, "Hey");
+    }
 
     return res.status(200).send("OK");
   });

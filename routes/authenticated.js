@@ -5,12 +5,15 @@ const logger = require('heroku-logger');
 const Op = require('sequelize').Op;
 
 const db = require('../db');
+const graph = require('../graph');
+const messages = require('../messages');
 
 const router = express.Router();
 
 router.use((req, res, next) => {
   res.locals.navigation = [
     {name: 'Documents', path: '/documents'},
+    {name: 'Messages', path: '/messages'},
     {name: 'Admin', path: '/admin'},
   ];
   next();
@@ -76,6 +79,15 @@ router.route('/document/:id')
       return res.render('document', {document});
     })
     .catch(next),
+  );
+
+router.route('/messages')
+  .get((req, res, next) => res.render('messages'))
+  .post((req, res, next) => {
+      messages.postMessage(req.body.target, req.body.message)
+      .then(() => res.redirect('/messages'))
+      .catch(next);
+    }
   );
 
 router.route('/link_account_confirm')
