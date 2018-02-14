@@ -15,7 +15,7 @@ function loginRedirect(req, res, next) {
   if (req.user) {
     next();
   } else {
-    let host = req.host;
+    let host = req.hostname;
     if (req.app.get('port') !== 80) {
       host += `:${req.app.get('port')}`;
     }

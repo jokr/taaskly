@@ -158,16 +158,20 @@ router.route('/unfurl_callback')
                 linked_user: user !== null,
               });
           }
+          const data = {
+            link: change.link,
+            title: doc.name,
+            description: doc.content.toString().substring(0, 200),
+            privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+            type: 'doc',
+          };
+          if (doc.icon) {
+            data.icon = process.env.BASE_URL + doc.icon;
+          }
           return res
             .status(200)
             .json({
-              data: [{
-                link: change.link,
-                title: doc.name,
-                description: doc.content.toString().substring(0, 200),
-                privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-                type: 'doc',
-              }],
+              data: [data],
               linked_user: user !== null,
             });
         })

@@ -45,6 +45,7 @@ router.route('/document/create')
       content: req.body.content,
       privacy: req.body.privacy,
       ownerId: req.user.id,
+      icon: req.body.unicorn ? 'unicorn.png' : null,
     })
     .then(() => res.redirect('/documents'))
     .catch(next),
