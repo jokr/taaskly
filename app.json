@@ -12,24 +12,24 @@
   "success_url": "/",
   "env": {
     "APP_ID": {
-      "description": "App ID from custom integration.",
-      "value": "UNSET"
+      "description": "App ID from Dev Dashboard.",
+      "value": "9999999999999999"
     },
     "APP_SECRET": {
-      "description": "App Secret from custom integration.",
-      "value": "UNSET"
+      "description": "App Secret from Dev Dashboard.",
+      "value": "0123456789abcdef"
     },
     "APP_REDIRECT": {
       "description": "todo",
-      "value": "UNSET"
+      "value": "https://XXXX.herokuapp.com/community_install"
     },
     "SESSION_SECRET": {
       "description": "todo",
-      "value": "UNSET"
+      "generator": "random"
     },
     "WEBHOOK_CALLBACK": {
       "description": "todo",
-      "value": "UNSET"
+      "value": "https://XXXX.herokuapp.com/api/webhook"
     },
     "SALT_ROUNDS": {
       "description": "Number of bcrypt rounds.",
