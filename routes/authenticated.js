@@ -87,7 +87,7 @@ router.route('/messages')
       messages.postMessage(req.body.target, req.body.message)
       .then(() => res.redirect('/messages'))
       .catch(next);
-    }
+    },
   );
 
 router.route('/link_account_confirm')

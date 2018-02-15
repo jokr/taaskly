@@ -1,8 +1,5 @@
 'use strict';
 
-const logger = require('heroku-logger')
-const request = require('request-promise');
-
 const graph = require('./graph');
 
 function token() {

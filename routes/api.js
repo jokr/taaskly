@@ -60,7 +60,7 @@ function processChallenge(req, res, next) {
   return res.status(200).send(params['hub.challenge']);
 }
 
-function logAndValidateCallback(req) {
+function logAndValidateCallback(req, res, next) {
   db.models.callback
     .create({ path: req.originalUrl, headers: req.headers, body: req.body })
     .then()
@@ -69,6 +69,7 @@ function logAndValidateCallback(req) {
     logger.warn('missing x-hub-signature');
     throw new BadRequest('Invalid x-hub-signature.');
   }
+  next();
 }
 
 router.use(bodyParser.json({ verify: xhub }));
@@ -86,25 +87,24 @@ function readMessaging(body) {
   return body.entry[0].messaging[0];
 }
 
-router.route('/webhook')
+router.route('/message_callback')
   .get(processChallenge)
-  .post((req, res, next) => {
-    logAndValidateCallback(req);
+  .post(
+    logAndValidateCallback,
+    (req, res, next) => {
+      // TODO should handle batching of entries
+      const messaging = readMessaging(req.body);
 
-    // TODO should handle batching of entries
+      console.log(messaging);
 
-    const messaging = readMessaging(req.body);
+      if (messaging.message) {
+        // t_xxxxx for threads
+        const target = messaging.thread ? messaging.thread.id : messaging.sender.id;
+        messages.postMessage(target, "Hey");
+      }
 
-    console.log(messaging);
-
-    if (messaging.message) {
-      // t_xxxxx for threads
-      const target = messaging.thread ? messaging.thread.id : messaging.sender.id;
-      messages.postMessage(target, "Hey");
-    }
-
-    return res.status(200).send("OK");
-  });
+      return res.status(200).send("OK");
+    });
 
 function readChange(body) {
     if (body.entry.length !== 1) {
@@ -120,58 +120,58 @@ function readChange(body) {
 
 router.route('/unfurl_callback')
   .get(processChallenge)
-  .post((req, res, next) => {
-    logAndValidateCallback(req);
+  .post(
+    logAndValidateCallback,
+    (req, res, next) => {
+      if (req.body.object !== 'link') {
+        logger.warn('Received invalid link webhook', req.body);
+        throw new BadRequest('Invalid topic.');
+      }
 
-    if (req.body.object !== 'link') {
-      logger.warn('Received invalid link webhook', req.body);
-      throw new BadRequest('Invalid topic.');
-    }
+      const change = readChange(req.body);
 
-    const change = readChange(req.body);
+      const regexMatch = change.link.match(/^https:\/\/pusheen-suite\.herokuapp\.com\/document\/([0-9]+)/);
+      if (regexMatch === null || regexMatch.length !== 2) {
+        throw new BadRequest('Unknown document link');
+      }
 
-    const regexMatch = change.link.match(/^https:\/\/pusheen-suite\.herokuapp\.com\/document\/([0-9]+)/);
-    if (regexMatch === null || regexMatch.length !== 2) {
-      throw new BadRequest('Unknown document link');
-    }
-
-    Promise.all([
-        db.models.document.findById(parseInt(regexMatch[1])),
-        db.models.community.findById(parseInt(change.community.id)),
-        db.models.user.findOne({where: {workplaceID: change.user.id}}),
-      ])
-      .then(results => {
-        const doc = results[0];
-        if (doc === null) {
-          return res.status(404).send('No document with this id exists.');
-        }
-        const community = results[1];
-        if (community === null) {
-          return res.status(400).send('Unknown community.');
-        }
-        const user = results[2];
-        if (doc.privacy !== 'public' && doc.ownerId !== user.id) {
+      Promise.all([
+          db.models.document.findById(parseInt(regexMatch[1])),
+          db.models.community.findById(parseInt(change.community.id)),
+          db.models.user.findOne({where: {workplaceID: change.user.id}}),
+        ])
+        .then(results => {
+          const doc = results[0];
+          if (doc === null) {
+            return res.status(404).send('No document with this id exists.');
+          }
+          const community = results[1];
+          if (community === null) {
+            return res.status(400).send('Unknown community.');
+          }
+          const user = results[2];
+          if (doc.privacy !== 'public' && doc.ownerId !== user.id) {
+            return res
+              .status(200)
+              .json({
+                data: [],
+                linked_user: user !== null,
+              });
+          }
           return res
             .status(200)
             .json({
-              data: [],
+              data: [{
+                link: change.link,
+                title: doc.name,
+                privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+                type: 'document',
+              }],
               linked_user: user !== null,
             });
-        }
-        return res
-          .status(200)
-          .json({
-            data: [{
-              link: change.link,
-              title: doc.name,
-              privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-              type: 'document',
-            }],
-            linked_user: user !== null,
-          });
-      })
-      .catch(next);
-  });
+        })
+        .catch(next);
+    });
 
 router.use('*', (req, res, next) => res.status(404).send());
 router.use(errorHandler);
