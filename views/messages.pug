@@ -1,0 +1,21 @@
+html
+  head
+    title Pusheen Suite
+    link(href="/favicon.ico" rel="icon" type="image/x-icon")
+    link(href="/style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      include includes/header.pug
+      h1 Messages Panel
+      p.
+        Recent Messages and Sending.
+      h2 Send
+      form(action="/messages" method="post")
+        div.form-group
+          label(for='target') Name:
+          input#target.form-control(type='text' placeholder='target (t_xxxx or xxxx)' name='target')
+        div.form-group
+          label(for='message') Name:
+          input#message.form-control(type='text' placeholder='message text' name='message')
+        button.btn.btn-primary(type='submit') Send
+      h2 Recent

@@ -89,6 +89,10 @@ const Community = sequelize.define('community', {
 });
 
 const Callback = sequelize.define('callback', {
+  path: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
   headers: {
     type: Sequelize.JSON,
     allowNull: false,
