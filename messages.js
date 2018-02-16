@@ -2,15 +2,18 @@
 
 const graph = require('./graph');
 
-function token() {
-  if (process.env.ACCESS_TOKEN) {
-    return process.env.ACCESS_TOKEN;
+function defaultToken(token) {
+  if (token !== null) {
+    return Promise.resolve(token);
+  } else if (process.env.ACCESS_TOKEN) {
+    return Promise.resolve(process.env.ACCESS_TOKEN);
   } else {
+    db.models.community.findOne()
     throw new Error("lookup of token from db not implemented");
   }
 }
 
-function postMessage(target, message) {
+function postMessage(target, message, token) {
   const recipient = target.startsWith("t_") ?
   {
     thread_key: target
@@ -19,6 +22,10 @@ function postMessage(target, message) {
     id: target
   };
 
+  if (token === null) {
+    token = defaultToken();
+  }
+
   const messageData = {
     recipient: recipient,
     message: {
@@ -26,11 +33,12 @@ function postMessage(target, message) {
     }
   };
 
-  return graph('me/messages')
-    .post()
-    .token(token())
-    .body(messageData)
-    .send();
+  return defaultToken().then(token =>
+    graph('me/messages')
+      .post()
+      .token(token)
+      .body(messageData)
+      .send());
 }
 
 module.exports = {
