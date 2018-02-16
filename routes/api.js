@@ -100,7 +100,7 @@ router.route('/message_callback')
       if (messaging.message) {
         // t_xxxxx for threads
         const target = messaging.thread ? messaging.thread.id : messaging.sender.id;
-        messages.postMessage(target, "Hey");
+        messages.postTextMessage(target, "Hey");
       }
 
       return res.status(200).send("OK");

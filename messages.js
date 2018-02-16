@@ -10,20 +10,13 @@ function token() {
   }
 }
 
-function postMessage(target, message) {
-  const recipient = target.startsWith("t_") ?
+function postMessage(target, messageData) {
+  messageData['recipient'] = target.startsWith("t_") ?
   {
     thread_key: target
   } :
   {
     id: target
-  };
-
-  const messageData = {
-    recipient: recipient,
-    message: {
-      text: message
-    }
   };
 
   return graph('me/messages')
@@ -33,6 +26,17 @@ function postMessage(target, message) {
     .send();
 }
 
+function postTextMessage(target, message) {
+  const messageData = {
+    message: {
+      text: message
+    }
+  };
+
+  return postMessage(target, messageData);
+}
+
 module.exports = {
-  postMessage: postMessage
+  postMessage: postMessage,
+  postTextMessage: postTextMessage,
 };
