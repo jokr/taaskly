@@ -10,15 +10,6 @@ const messages = require('../messages');
 
 const router = express.Router();
 
-router.use((req, res, next) => {
-  res.locals.navigation = [
-    {name: 'Documents', path: '/documents'},
-    {name: 'Messages', path: '/messages'},
-    {name: 'Admin', path: '/admin'},
-  ];
-  next();
-});
-
 router.route('/logout')
   .get((req, res, next) => {
     req.logout();

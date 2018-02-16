@@ -24,6 +24,15 @@ function loginRedirect(req, res, next) {
   }
 }
 
+function forceAdmin(req, res, next) {
+  console.log('yolo', req.isAdmin);
+  if (req.isAdmin) {
+    next();
+  } else {
+    res.status(403).render('error', {message: 'You are not an admin.'});
+  }
+}
+
 function errorHandler(err, req, res, next) {
   logger.error(err);
   res.status(500).render('error', {message: err.message, details: err.stack});
@@ -31,11 +40,29 @@ function errorHandler(err, req, res, next) {
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+  req.isAdmin = req.user && req.user.id === 1;
+  next();
+})
+
+router.use((req, res, next) => {
+  const navigation = [];
+  if (req.user) {
+    navigation.push({name: 'Documents', path: '/documents'});
+    navigation.push({name: 'Messages', path: '/messages'});
+    if (req.isAdmin) {
+      navigation.push({name: 'Admin', path: '/admin'});
+    }
+  }
+  res.locals.navigation = navigation;
+  next();
+});
+
 router.use(loggedout);
 router.use('/api', api);
-router.use('/admin', admin);
 router.use(loginRedirect);
 router.use(authenticated);
+router.use('/admin', forceAdmin, admin);
 router.use(errorHandler);
 
 module.exports = router;
