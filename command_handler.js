@@ -1,6 +1,6 @@
 'use strict';
 
-const message_sender = require('./messages');
+const messageSender = require('./messages');
 
 const COMMAND_HANDLER_LIST = [];
 
@@ -26,7 +26,7 @@ function registerHandler(command, description, handleCallback) {
 
 function init() {
   registerHandler('hi', 'Greeting from Pusheen', function(senderID, token) {
-    return message_sender.postTextMessage(senderID, 'Hi there! Type "help" to check out the full list of commands', token);
+    return messageSender.postTextMessage(senderID, 'Hi there! Type "help" to check out the full list of commands', token);
   });
   registerHandler('help', 'The command you are seeing right now', function(senderID, token) {
     const handlerList = COMMAND_HANDLER_LIST;
@@ -37,8 +37,11 @@ function init() {
       helpMessage += ('`' + handler.command.padEnd(commandMaxLength + 4) + handler.description + '`\n');
     });
 
-    return message_sender.postTextMessage(senderID, helpMessage, token);
+    return messageSender.postTextMessage(senderID, helpMessage, token);
   });
+  registerHandler('button', 'Send Button Template', sendButtonMessage);
+  registerHandler('quick reply', 'Send Quick Reply', sendQuickReplyMessage);
+  registerHandler('extension', 'Send a web button with Extension SDK integrated', sendExtension);
 }
 
 function sendButtonMessage(senderID, token) {
@@ -66,7 +69,7 @@ function sendButtonMessage(senderID, token) {
       }
     }
   };
-  message_sender.postMessage(senderID, messageData, token);
+  return messageSender.postMessage(senderID, messageData, token);
 }
 
 function sendQuickReplyMessage(senderID, token) {
@@ -92,8 +95,32 @@ function sendQuickReplyMessage(senderID, token) {
       ]
     }
   };
-  message_sender.postMessage(senderID, messageData, token);
+  return messageSender.postMessage(senderID, messageData, token);
 }
+
+function sendExtension(senderID, token) {
+  var messageData = {
+    message: {
+      attachment: {
+        type: "template",
+        payload: {
+          template_type: "button",
+          text: "Web page with Extension SDK enabled",
+          buttons:[{
+            type: "web_url",
+            messenger_extensions: true,
+            url: "https://scott-pusheen.herokuapp.com/extension?appID=" + process.env.APP_ID,
+            title: "This is a title",
+            webview_height_ratio: "tall"
+          }]
+        }
+      }
+    }
+  };
+  return messageSender.postMessage(senderID, messageData, token);
+}
+
+init();
 
 exports.handleCommand = function(senderID, command, token) {
   const handler = COMMAND_HANDLER_LIST.find(handler => {

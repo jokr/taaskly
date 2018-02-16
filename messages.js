@@ -37,7 +37,7 @@ function postTextMessage(target, message, token) {
     }
   };
 
-  return postMessage(target, messageData);
+  return postMessage(target, messageData, token);
 }
 
 module.exports = {
