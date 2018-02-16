@@ -160,6 +160,7 @@ router.route('/unfurl_callback')
             title: doc.name,
             description: doc.content.toString().substring(0, 200),
             privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+            download_url: process.env.BASE_URL + 'pdf-sample.pdf',
             type: 'doc',
           };
           if (doc.icon) {
