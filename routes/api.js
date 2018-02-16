@@ -7,6 +7,7 @@ const logger = require('heroku-logger');
 
 const db = require('../db');
 const messages = require('../messages');
+const message_handler = require('../message_handler');
 
 const router = express.Router();
 
@@ -92,16 +93,12 @@ router.route('/message_callback')
   .post(
     logAndValidateCallback,
     (req, res, next) => {
-      // TODO should handle batching of entries
-      const messaging = readMessaging(req.body);
-
-      console.log(messaging);
-
-      if (messaging.message) {
-        // t_xxxxx for threads
-        const target = messaging.thread ? messaging.thread.id : messaging.sender.id;
-        messages.postMessage(target, "Hey");
-      }
+      const data = req.body;
+      data.entry.forEach(function(singleEntry) {
+        singleEntry.messaging.forEach(function(messagingEvent) {
+          message_handler.handleSingleMessageEvent(messagingEvent);
+        });
+      });
 
       return res.status(200).send("OK");
     });
@@ -158,15 +155,20 @@ router.route('/unfurl_callback')
                 linked_user: user !== null,
               });
           }
+          const data = {
+            link: change.link,
+            title: doc.name,
+            description: doc.content.toString().substring(0, 200),
+            privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+            type: 'doc',
+          };
+          if (doc.icon) {
+            data.icon = process.env.BASE_URL + doc.icon;
+          }
           return res
             .status(200)
             .json({
-              data: [{
-                link: change.link,
-                title: doc.name,
-                privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-                type: 'document',
-              }],
+              data: [data],
               linked_user: user !== null,
             });
         })

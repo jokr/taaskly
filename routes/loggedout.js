@@ -40,7 +40,7 @@ router.route('/register')
             logger.warn(err);
             return next(err);
           }
-          return res.redirect('/users');
+          return res.redirect('/documents');
         });
       })
       .catch(err => {

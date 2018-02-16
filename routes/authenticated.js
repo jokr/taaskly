@@ -10,15 +10,6 @@ const messages = require('../messages');
 
 const router = express.Router();
 
-router.use((req, res, next) => {
-  res.locals.navigation = [
-    {name: 'Documents', path: '/documents'},
-    {name: 'Messages', path: '/messages'},
-    {name: 'Admin', path: '/admin'},
-  ];
-  next();
-});
-
 router.route('/logout')
   .get((req, res, next) => {
     req.logout();
@@ -45,6 +36,7 @@ router.route('/document/create')
       content: req.body.content,
       privacy: req.body.privacy,
       ownerId: req.user.id,
+      icon: req.body.unicorn ? 'unicorn.png' : null,
     })
     .then(() => res.redirect('/documents'))
     .catch(next),
@@ -84,7 +76,7 @@ router.route('/document/:id')
 router.route('/messages')
   .get((req, res, next) => res.render('messages'))
   .post((req, res, next) => {
-      messages.postMessage(req.body.target, req.body.message)
+      messages.postTextMessage(req.body.target, req.body.message)
       .then(() => res.redirect('/messages'))
       .catch(next);
     },

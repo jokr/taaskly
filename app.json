@@ -38,6 +38,10 @@
     "SALT_ROUNDS": {
       "description": "Number of bcrypt rounds.",
       "value": "10"
+    },
+    "BASE_URL": {
+      "description": "Base url for the application",
+      "value": "https://XXXX.herokuapp.com/"
     }
   },
   "formation": {

@@ -49,21 +49,28 @@ const User = sequelize.define('user', {
 });
 
 const Document = sequelize.define('document', {
-  'name': {
+  name: {
     type: Sequelize.STRING,
     validate: {
       notEmpty: true,
     },
     allowNull: false,
   },
-  'content': {
+  content: {
     type: Sequelize.BLOB,
     allowNull: false,
   },
-  'privacy': {
+  privacy: {
     type: Sequelize.ENUM('public', 'restricted'),
     defaultValue: 'public',
     allowNull: false,
+  },
+  icon: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: true,
   },
 });
 
