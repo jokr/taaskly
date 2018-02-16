@@ -1,24 +1,26 @@
 'use static';
 
 const message_sender = require('./messages');
+const db = require('./db');
 
 exports.handleSingleMessageEvent = function(messagingEvent) {
   const senderID = messagingEvent.thread ? messagingEvent.thread.id : messagingEvent.sender.id;
 
   if (messagingEvent.optin) {
-    onReceiveAuthentication(senderID, messagingEvent);
+    return onReceiveAuthentication(senderID, messagingEvent);
   } else if (messagingEvent.message) {
-    onReceiveMessage(senderID, messagingEvent);
+    return onReceiveMessage(senderID, messagingEvent);
   } else if (messagingEvent.delivery) {
-    onReceiveDeliveryConfirmation(senderID, messagingEvent);
+    return onReceiveDeliveryConfirmation(senderID, messagingEvent);
   } else if (messagingEvent.postback) {
-    receivedPostback(senderID, messagingEvent);
+    return receivedPostback(senderID, messagingEvent);
   } else if (messagingEvent.read) {
-    receivedMessageRead(senderID, messagingEvent);
+    return receivedMessageRead(senderID, messagingEvent);
   } else if (messagingEvent.account_linking) {
-    receivedAccountLink(senderID, messagingEvent);
+    return receivedAccountLink(senderID, messagingEvent);
   } else {
     console.log('Webhook received unknown messagingEvent: ', messagingEvent);
+    return Promise.resolve();
   }
 };
 
@@ -32,7 +34,7 @@ exports.handleSingleMessageEvent = function(messagingEvent) {
  */
 function onReceiveAuthentication(senderID, messagingEvent) {
   // TODO: add handling of Account linking Event
-  message_sender.postTextMessage(senderID, 'Received authorization event');
+  return message_sender.postTextMessage(senderID, 'Received authorization event');
 }
 
 function onReceiveMessage(senderID, messagingEvent) {
@@ -42,11 +44,14 @@ function onReceiveMessage(senderID, messagingEvent) {
   const messageAttachments = message.attachments;
   const quickReply = message.quick_reply;
   const isEcho = message.is_echo;
+  const community = messagingEvent.sender.community.id;
+
+  const botToken = db.models.community.findOne().then(communityToken => communityToken ? communityToken.accessToken : null);
 
   if (isEcho) {
     // no-op for echo messages
     console.log('received echo');
-    return;
+    return Promise.resolve();
   }
 
   if (quickReply) {
@@ -54,21 +59,21 @@ function onReceiveMessage(senderID, messagingEvent) {
     const quickReplyPayload = quickReply.payload;
     const stringifiedPayload = JSON.stringify(quickReplyPayload);
     console.log('received quick reply with payload: %s', stringifiedPayload);
-    message_sender.postTextMessage(senderID, 'Received quick reply: ' + stringifiedPayload);
-    return;
+    return message_sender.postTextMessage(senderID, 'Received quick reply: ' + stringifiedPayload);
   }
 
   if (messageAttachments) {
     // TODO: this needs more complicated unpacking
     const stringifiedAttachments = JSON.stringify(messageAttachments);
     console.log('received attachments with payload: %s', stringifiedAttachments);
-    message_sender.postTextMessage(senderID, 'Received attachments: ' + stringifiedAttachments);
-    return;
+    return message_sender.postTextMessage(senderID, 'Received attachments: ' + stringifiedAttachments);
   }
 
   if (messageText) {
     // process cleaned up message text as commands
-    onReceiveCommand(senderID, messageText.replace(/[^\w\s]/gi, '').trim().toLowerCase());
+    return botToken.then(token =>
+      onReceiveCommand(senderID, messageText.replace(/[^\w\s]/gi, '').trim().toLowerCase(), token)
+    );
   }
 }
 
@@ -76,20 +81,15 @@ function onReceiveCommand(senderID, messageText) {
   switch (messageText) {
     case 'hello':
     case 'hi':
-      message_sender.postTextMessage(senderID, 'Hi there! Type "help" to check out the full list of commands');
-      break;
+      return message_sender.postTextMessage(senderID, 'Hi there! Type "help" to check out the full list of commands');
     case 'help':
-      message_sender.postTextMessage(senderID, 'help command');
-      break;
+      return message_sender.postTextMessage(senderID, 'help command');
     case 'button':
-      sendButtonMessage(senderID);
-      break;
+      return sendButtonMessage(senderID);
     case 'quick reply':
-      sendQuickReplyMessage(senderID);
-      break;
+      return sendQuickReplyMessage(senderID);
     default:
-      message_sender.postTextMessage(senderID, 'Did you just say ' + messageText + '?');
-      break;
+      return message_sender.postTextMessage(senderID, 'Did you just say ' + messageText + '?');
   }
 }
 
@@ -118,7 +118,7 @@ function sendButtonMessage(senderID) {
       }
     }
   };
-  message_sender.postMessage(senderID, messageData);
+  return message_sender.postMessage(senderID, messageData);
 }
 
 function sendQuickReplyMessage(senderID) {
@@ -144,13 +144,15 @@ function sendQuickReplyMessage(senderID) {
       ]
     }
   };
-  message_sender.postMessage(senderID, messageData);
+  return message_sender.postMessage(senderID, messageData);
 }
 
 function onReceiveDeliveryConfirmation(senderID, messagingEvent) {
   console.log('onReceiveDeliveryConfirmation from %s with data %s', senderID, JSON.stringify(messagingEvent));
+  return Promise.resolve();
 }
 
 function onReceivePostback(senderID, messagingEvent) {
   console.log('onReceivePostback from %s with data %s', senderID, JSON.stringify(messagingEvent));
+  return Promise.resolve();
 }

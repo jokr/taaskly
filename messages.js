@@ -2,15 +2,18 @@
 
 const graph = require('./graph');
 
-function token() {
-  if (process.env.ACCESS_TOKEN) {
-    return process.env.ACCESS_TOKEN;
+function defaultToken(token) {
+  if (token !== null) {
+    return Promise.resolve(token);
+  } else if (process.env.ACCESS_TOKEN) {
+    // TODO refactor make this a pure function
+    return Promise.resolve(process.env.ACCESS_TOKEN);
   } else {
-    throw new Error("lookup of token from db not implemented");
+    return db.models.community.findOne().then(communityToken => communityToken.accessToken);
   }
 }
 
-function postMessage(target, messageData) {
+function postMessage(target, messageData, token) {
   messageData['recipient'] = target.startsWith("t_") ?
   {
     thread_key: target
@@ -19,14 +22,15 @@ function postMessage(target, messageData) {
     id: target
   };
 
-  return graph('me/messages')
-    .post()
-    .token(token())
-    .body(messageData)
-    .send();
+  return defaultToken(token).then(resolvedToken =>
+  	 graph('me/messages')
+      .post()
+      .token(resolvedToken)
+      .body(messageData)
+      .send());
 }
 
-function postTextMessage(target, message) {
+function postTextMessage(target, message, token) {
   const messageData = {
     message: {
       text: message

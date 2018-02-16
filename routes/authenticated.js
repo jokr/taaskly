@@ -76,7 +76,7 @@ router.route('/document/:id')
 router.route('/messages')
   .get((req, res, next) => res.render('messages'))
   .post((req, res, next) => {
-      messages.postMessage(req.body.target, req.body.message)
+      messages.postTextMessage(req.body.target, req.body.message, null)
       .then(() => res.redirect('/messages'))
       .catch(next);
     },
