@@ -7,6 +7,7 @@ const logger = require('heroku-logger');
 
 const db = require('../db');
 const messages = require('../messages');
+const message_handler = require('../message_handler');
 
 const router = express.Router();
 
@@ -92,16 +93,12 @@ router.route('/message_callback')
   .post(
     logAndValidateCallback,
     (req, res, next) => {
-      // TODO should handle batching of entries
-      const messaging = readMessaging(req.body);
-
-      console.log(messaging);
-
-      if (messaging.message) {
-        // t_xxxxx for threads
-        const target = messaging.thread ? messaging.thread.id : messaging.sender.id;
-        messages.postTextMessage(target, "Hey");
-      }
+      const data = req.body;
+      data.entry.forEach(function(singleEntry) {
+        singleEntry.messaging.forEach(function(messagingEvent) {
+          message_handler.handleSingleMessageEvent(messagingEvent);
+        });
+      });
 
       return res.status(200).send("OK");
     });
