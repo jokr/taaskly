@@ -96,7 +96,7 @@ router.route('/message_callback')
       const data = req.body;
       data.entry.forEach(function(singleEntry) {
         singleEntry.messaging.forEach(function(messagingEvent) {
-          message_handler.handleSingleMessageEvent(messagingEvent);
+          message_handler.handleSingleMessageEvent(req, messagingEvent);
         });
       });
 
