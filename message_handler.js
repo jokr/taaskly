@@ -6,18 +6,16 @@ const url = require('url');
 
 exports.handleSingleMessageEvent = function(req, messagingEvent) {
   const senderID = messagingEvent.thread ? messagingEvent.thread.id : messagingEvent.sender.id;
-  // TODO: only Page ID is sent back, need logic to convert to AppID, hardcode for now
-  const appID = process.env.APP_ID;
-  const host = req.get('host');
+  const communityID = messagingEvent.sender.community.id;
 
-  return db.models.community.findById(parseInt(appID)).then(community => {
+  return db.models.community.findById(parseInt(communityID)).then(community => {
     // in case this is configured as a custom integration, get token from env variable
     const token = community ? community.accessToken : process.env.ACCESS_TOKEN;
     if (token) {
       const appEnv = {
-        appID: appID,
+        appID: process.env.APP_ID,
         token: token,
-        host: host,
+        host: req.get('host'),
       };
       if (messagingEvent.optin) {
         return onReceiveAuthentication(senderID, messagingEvent, appEnv);
