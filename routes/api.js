@@ -127,51 +127,73 @@ router.route('/unfurl_callback')
 
       const change = readChange(req.body);
 
-      const regexMatch = change.link.match(/^https:\/\/pusheen-suite\.herokuapp\.com\/document\/([0-9]+)/);
-      if (regexMatch === null || regexMatch.length !== 2) {
+      const regexMatch = change.link
+        .match(/^https:\/\/pusheen-suite\.herokuapp\.com\/(document|task)\/([0-9]+)/);
+      if (regexMatch === null || regexMatch.length !== 3) {
         throw new BadRequest('Unknown document link');
       }
 
-      Promise.all([
-          db.models.document.findById(parseInt(regexMatch[1])),
-          db.models.community.findById(parseInt(change.community.id)),
-          db.models.user.findOne({where: {workplaceID: change.user.id}}),
-        ])
-        .then(results => {
-          const doc = results[0];
-          if (doc === null) {
-            return res.status(404).send('No document with this id exists.');
-          }
-          const community = results[1];
+      db.models.community.findById(parseInt(change.community.id))
+        .then(community => {
           if (community === null) {
-            return res.status(400).send('Unknown community.');
+            throw new BadRequest('Unknown community.');
           }
-          const user = results[2];
-          if (doc.privacy !== 'public' && doc.ownerId !== user.id) {
-            return res
-              .status(200)
-              .json({
-                data: [],
-                linked_user: user !== null,
-              });
+          return db.models.user.findOne({where: {workplaceID: change.user.id}});
+        })
+        .then(user => {
+          const id = parseInt(regexMatch[2]);
+          switch (regexMatch[1]) {
+            case 'document':
+              return db.models.document
+                .findById(id)
+                .then(doc => {
+                  if (doc === null) {
+                    throw new BadRequest('No document with this id exists.');
+                  }
+                  if (doc.privacy !== 'public' && doc.ownerId !== user.id) {
+                    return res
+                      .status(200)
+                      .json({
+                        data: [],
+                        linked_user: user !== null,
+                      });
+                  }
+                  const data = {
+                    link: change.link,
+                    title: doc.name,
+                    description: doc.content.toString().substring(0, 200),
+                    privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+                    download_url: process.env.BASE_URL + 'pdf-sample.pdf',
+                    type: 'doc',
+                  };
+                  if (doc.icon) {
+                    data.icon = process.env.BASE_URL + doc.icon;
+                  }
+                  return {data, user};
+                });
+              break;
+            case 'task':
+              return db.models.task
+                .findById(id)
+                .then(task => {
+                  if (task === null) {
+                    throw new BadRequest('No task with this id exists.');
+                  }
+                  const data = {
+                    link: change.link,
+                    title: task.title,
+                    privacy: 'organization',
+                    type: 'task',
+                  };
+                  return {data, user};
+                });
+              break;
+            default:
+              throw new BadRequest('Invalid url.');
           }
-          const data = {
-            link: change.link,
-            title: doc.name,
-            description: doc.content.toString().substring(0, 200),
-            privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-            download_url: process.env.BASE_URL + 'pdf-sample.pdf',
-            type: 'doc',
-          };
-          if (doc.icon) {
-            data.icon = process.env.BASE_URL + doc.icon;
-          }
-          return res
-            .status(200)
-            .json({
-              data: [data],
-              linked_user: user !== null,
-            });
+        })
+        .then(response => {
+          res.status(200).json({data: [response.data], linked_user: response.data !== null});
         })
         .catch(next);
     });
