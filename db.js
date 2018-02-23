@@ -48,6 +48,25 @@ const User = sequelize.define('user', {
   },
 });
 
+const Task = sequelize.define('task', {
+  title: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+  },
+  completed: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  priority: {
+    type: Sequelize.ENUM('high', 'medium', 'low'),
+    allowNull: true,
+  },
+});
+
 const Document = sequelize.define('document', {
   name: {
     type: Sequelize.STRING,
@@ -114,13 +133,14 @@ const Callback = sequelize.define('callback', {
 );
 
 Document.belongsTo(User, { as: 'owner',  foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
+Task.belongsTo(User, { as: 'owner', foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
 User.belongsTo(Community);
 
 let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() === 'true';
 
 Promise.all([Community.sync({force}), Callback.sync({force})])
   .then(() => User.sync({force}))
-  .then(() => Document.sync({force}))
+  .then(() => Promise.all([Document.sync({force}), Task.sync({force})]))
   .then(() => logger.info('Table sync complete.'))
   .catch(err => logger.error(err));
 

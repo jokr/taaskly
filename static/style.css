@@ -95,3 +95,25 @@ td a {
   font-size: .8rem;
   font-weight: bold;
 }
+
+.task {
+  color: white;
+  display: inline-block;
+  font-size: .8rem;
+  font-weight: bold;
+  min-width: 60px;
+  padding: 4px;
+  text-align: center;
+}
+
+.task-high {
+  background-color: #e62546;
+}
+
+.task-medium {
+  background-color: #ff8216;
+}
+
+.task-low {
+  background-color: #f0c850;
+}

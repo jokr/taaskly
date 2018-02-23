@@ -1,0 +1,24 @@
+html
+  head
+    title Pusheen Suite
+    link(href="/favicon.ico" rel="icon" type="image/x-icon")
+    link(href="/style.css", rel="stylesheet", type="text/css")
+  body
+    #main
+      include includes/header.pug
+      h1 Create a New Task
+      form(action="/task/create" method="post")
+        label.label Title
+          input(type="text" name="title" required)
+        p.label Priority
+        div
+          input(id="priority-high" type="radio" name="priority" value="high")
+          label(for="priority-high") High
+        div
+          input(id="priority-medium" type="radio" name="priority" value="medium")
+          label(for="priority-medium") Medium
+        div
+          input(id="priority-low" type="radio" name="priority" value="Low")
+          label(for="priority-low") Low
+        p
+          button(type="submit") Create
