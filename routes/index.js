@@ -45,6 +45,7 @@ router.use((req, res, next) => {
   const navigation = [];
   if (req.user) {
     navigation.push({name: 'Documents', path: '/documents'});
+    navigation.push({name: 'Tasks', path: '/tasks'});
     navigation.push({name: 'Messages', path: '/messages'});
     if (req.isAdmin) {
       navigation.push({name: 'Admin', path: '/admin'});

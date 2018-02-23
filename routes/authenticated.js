@@ -73,6 +73,31 @@ router.route('/document/:id')
     .catch(next),
   );
 
+router.route('/tasks')
+  .get((req, res, next) => db.models.task
+    .findAll({ include: [{ model: db.models.user, as: 'owner' }]})
+    .then(tasks => res.render('tasks', {tasks}))
+    .catch(next),
+  );
+
+router.route('/task/create')
+  .get((req, res, next) => res.render('createTask'))
+  .post((req, res, next) => db.models.task
+    .create({
+      title: req.body.title,
+      priority: req.body.priority,
+      ownerId: req.user.id,
+    })
+    .then(() => res.redirect('/tasks'))
+    .catch(next)
+  );
+
+router.route('/task/:id')
+  .get((req, res, next) => db.models.task
+    .findById(req.params.id, {include: [{ model: db.models.user, as: 'owner' }]})
+    .then(task => res.render('task', {task})),
+  );
+
 router.route('/messages')
   .get((req, res, next) => res.render('messages'))
   .post((req, res, next) => {
