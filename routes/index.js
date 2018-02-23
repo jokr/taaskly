@@ -15,11 +15,7 @@ function loginRedirect(req, res, next) {
   if (req.user) {
     next();
   } else {
-    let host = req.hostname;
-    if (req.app.get('port') !== 80) {
-      host += `:${req.app.get('port')}`;
-    }
-    req.session.loginReferrer = `${req.protocol}://${host}${req.originalUrl}`;
+    req.session.loginReferrer = req.originalUrl;
     res.redirect('/login');
   }
 }
