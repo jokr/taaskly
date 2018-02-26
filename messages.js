@@ -14,19 +14,46 @@ function defaultToken(token) {
 }
 
 function postMessage(target, messageData, token) {
-  messageData['recipient'] = target.startsWith("t_") ?
-  {
-    thread_key: target
-  } :
-  {
-    id: target
-  };
+  if (Array.isArray(target)) {
+    messageData['recipient'] = { ids: target }
+  } else if (target.startsWith("t_")) {
+    messageData['recipient'] = { thread_key: target }
+  } else {
+    messageData['recipient'] = { id: target }
+  }
 
   return defaultToken(token).then(resolvedToken =>
   	 graph('me/messages')
       .post()
       .token(resolvedToken)
       .body(messageData)
+      .send());
+}
+
+function renameThread(thread, newName, token) {
+  return defaultToken(token).then(resolvedToken =>
+  	 graph(thread + '/threadname')
+      .post()
+      .token(resolvedToken)
+      .body({name: newName})
+      .send());
+}
+
+function addToGroup(thread, recipients, token) {
+  return defaultToken(token).then(resolvedToken =>
+  	 graph(thread + '/participants')
+      .post()
+      .token(resolvedToken)
+      .body({to: recipients})
+      .send());
+}
+
+function removeFromGroup(thread, recipients, token) {
+  return defaultToken(token).then(resolvedToken =>
+  	 graph(thread + '/participants')
+      .delete()
+      .token(resolvedToken)
+      .body({to: recipients})
       .send());
 }
 
@@ -43,4 +70,13 @@ function postTextMessage(target, message, token) {
 module.exports = {
   postMessage: postMessage,
   postTextMessage: postTextMessage,
+  renameThread: renameThread,
+  addToGroup: addToGroup,
+  removeFromGroup: removeFromGroup,
 };
+
+// var token = "FQVJ2c1BXZAGd6U1NfTkh5NWpRNlphaVYwa0FBdnJGdVJ5WWpraUpJSE9SMDd0MzdIMVdPckhtcmwxZAW5ENzlONFhpOTZAQakNCcFJ1bFdjUmx5bVdXeUJlUlpTblFsUGpDOUVfSkNESUNFRGxsTnNzbWEyOUdIdkR0RUJqaWFaa0RHUGkwT0Y3TGZAJNVhjN04yX2RCNlhYSUNWWWRYNXBMZA3RqTVp5Wm43aWxfQWFvVGNCVzdXTVN5QXpjdlNnYk5ybXZAsUnZAR";
+// removeFromGroup("t_1773211609369648", ["100023912510021"], token).then(x =>
+// addToGroup("t_1773211609369648", ["100023912510021"], token)).then(y =>
+//   console.log("finished")
+// ).catch(e => console.log(e));
