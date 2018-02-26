@@ -24,11 +24,11 @@ exports.handleSingleMessageEvent = function(req, messagingEvent) {
       } else if (messagingEvent.delivery) {
         return onReceiveDeliveryConfirmation(senderID, messagingEvent, appEnv);
       } else if (messagingEvent.postback) {
-        return receivedPostback(senderID, messagingEvent, appEnv);
+        return onReceivePostback(senderID, messagingEvent, appEnv);
       } else if (messagingEvent.read) {
-        return receivedMessageRead(senderID, messagingEvent, appEnv);
+        return onReceiveMessageRead(senderID, messagingEvent, appEnv);
       } else if (messagingEvent.account_linking) {
-        return receivedAccountLink(senderID, messagingEvent, appEnv);
+        return onReceiveAccountLink(senderID, messagingEvent, appEnv);
       } else {
         console.log('Webhook received unknown messagingEvent: ', messagingEvent);
       }
@@ -52,13 +52,23 @@ function onReceiveAuthentication(senderID, messagingEvent, appEnv) {
   return messageSender.postTextMessage(senderID, 'Received authorization event', appEnv.token);
 }
 
-function onReceiveDeliveryConfirmation(senderID, messagingEvent) {
+function onReceiveDeliveryConfirmation(senderID, messagingEvent, appEnv) {
   console.log('onReceiveDeliveryConfirmation from %s with data %s', senderID, JSON.stringify(messagingEvent));
   return Promise.resolve();
 }
 
-function onReceivePostback(senderID, messagingEvent) {
+function onReceivePostback(senderID, messagingEvent, appEnv) {
   console.log('onReceivePostback from %s with data %s', senderID, JSON.stringify(messagingEvent));
+  return Promise.resolve();
+}
+
+function onReceiveMessageRead(senderID, messagingEvent, appEnv) {
+  console.log('onReceiveMessageRead from %s with data %s', senderID, JSON.stringify(messagingEvent));
+  return Promise.resolve();
+}
+
+function onReceiveAccountLink(senderID, messagingEvent, appEnv) {
+  console.log('onReceiveAccountLink from %s with data %s', senderID, JSON.stringify(messagingEvent));
   return Promise.resolve();
 }
 
