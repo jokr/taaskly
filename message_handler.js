@@ -199,6 +199,7 @@ function sendHelpMessage(senderID, appEnv) {
 `flight             Send Flight Template`\n\
 `quick reply        Send Quick Reply`\n\
 `extension          Send a web button with Extension SDK integrated`\n\
+`inbox              Show bot inbox`\n\
 `create group       Create a group with (name recipient1 recipient2..recipientN)`\n\
 `add to group       Remove recipients from a group (t_xxxx recipient1 recipient2..recipientN)`\n\
 `remove from group  Add recipients to a group (t_xxxx recipient1 recipient2..recipientN)`',
