@@ -67,7 +67,7 @@ function postTextMessage(target, message, token) {
   return postMessage(target, messageData, token);
 }
 
-function threads(token) {
+function inbox(token) {
   return defaultToken(token).then(resolvedToken =>
     graph('me/threads?fields=participants,name')
       .token(resolvedToken)
@@ -80,5 +80,5 @@ module.exports = {
   renameThread: renameThread,
   addToGroup: addToGroup,
   removeFromGroup: removeFromGroup,
-  threads: threads,
+  inbox: inbox,
 };

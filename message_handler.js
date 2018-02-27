@@ -137,7 +137,7 @@ function handleTextMessage(senderID, messageText, appEnv) {
     case 'extension':
       return sendExtension(senderID, appEnv);
     case 'inbox':
-      return showGroupChats(senderID, appEnv);
+      return showInbox(senderID, appEnv);
     case (command.match(/^create group \w+( \d+)+/) || {}).input:
       return createGroup(items[2], items.slice(3), appEnv);
     case (command.match(/^add to group \w+( \d+)+/) || {}).input:
@@ -149,21 +149,20 @@ function handleTextMessage(senderID, messageText, appEnv) {
   }
 }
 
-function showGroupChats(senderID, appEnv) {
+function showInbox(senderID, appEnv) {
   return messageSender.inbox(appEnv.token).then(results => {
-    var result = null;
+    var result = Promise.resolve();
 
-    for (var thread in results) {
-      result = result.then(x => {
-          var text = thread.name || thread.id;
-          console.log(text);
-          messageSender.postTextMessage(senderID, text, appEnv.token);
-        }
-      );
-    }
-
-    if (result == null) {
+    if (results.length == 0) {
       result = messageSender.postTextMessage(senderID, 'No group chats', appEnv.token);
+    } else {
+      results.forEach(thread => {
+        result = result.then(x => {
+          var text = "Thread: " + thread.id + " " + (thread.name || '') + "\n";
+          thread.participants.data.forEach(participant => { text += participant.name + " (" + participant.id + ")\n" });
+          return messageSender.postTextMessage(senderID, text, appEnv.token);
+        });
+      });
     }
 
     return result;
