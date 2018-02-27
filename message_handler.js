@@ -136,6 +136,8 @@ function handleTextMessage(senderID, messageText, appEnv) {
       return sendQuickReply(senderID, appEnv);
     case 'extension':
       return sendExtension(senderID, appEnv);
+    case 'inbox':
+      return showGroupChats(senderID, appEnv);
     case (command.match(/^create group \w+( \d+)+/) || {}).input:
       return createGroup(items[2], items.slice(3), appEnv);
     case (command.match(/^add to group \w+( \d+)+/) || {}).input:
@@ -145,6 +147,28 @@ function handleTextMessage(senderID, messageText, appEnv) {
     default:
       return messageSender.postTextMessage(senderID, 'Did you just say ' + messageText + '? Try "help" to find the list of commands supported!', appEnv.token);
   }
+}
+
+function showGroupChats(senderID, token) {
+  return messageSender.inbox(token).then(results => {
+    var result = null;
+
+    for (var thread in results) {
+      result = result.then(x => {
+          var text = thread.name || thread.id;
+          console.log(text);
+          messageSender.postTextMessage(senderID, text, appEnv.token);
+        }
+      );
+    }
+
+    if (result == null) {
+      result = messageSender.postTextMessage(senderID, 'No group chats', appEnv.token);
+    }
+
+    return result;
+  });
+
 }
 
 function createGroup(threadName, recipients, appEnv) {
