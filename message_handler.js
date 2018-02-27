@@ -111,7 +111,9 @@ function onReceiveMessage(senderID, messagingEvent, appEnv) {
 }
 
 function handleTextMessage(senderID, messageText, appEnv) {
-  switch (messageText.replace(/[^\w\s]/gi, '').trim().toLowerCase()) {
+  var command = messageText.replace(/[^\w\s]/gi, '').replace(/\s+/, ' ').trim().toLowerCase();
+  var items = command.split(' ');
+  switch (command) {
     case 'hi':
     case 'hey':
     case 'hello':
@@ -134,9 +136,27 @@ function handleTextMessage(senderID, messageText, appEnv) {
       return sendQuickReply(senderID, appEnv);
     case 'extension':
       return sendExtension(senderID, appEnv);
+    case (command.match(/^create group \w+( \d+)+/) || {}).input:
+      return createGroup(items[2], items.slice(3), appEnv);
+    case (command.match(/^add to group \w+( \d+)+/) || {}).input:
+      return messageSender.addToGroup(items[3], items.slice(4), appEnv.token);
+    case (command.match(/^remove from group \w+( \d+)+/) || {}).input:
+      return messageSender.removeFromGroup(items[3], items.slice(4), appEnv.token);
     default:
       return messageSender.postTextMessage(senderID, 'Did you just say ' + messageText + '? Try "help" to find the list of commands supported!', appEnv.token);
   }
+}
+
+function createGroup(threadName, recipients, appEnv) {
+  const messageData = {
+    message: {
+      text: "New Group"
+    }
+  };
+
+  return messageSender
+    .postMessage(recipients, messageData, appEnv.token).then(threadData =>
+      messageSender.renameThread(threadData.thread_key, threadName, appEnv.token));
 }
 
 function sendGreetingMessage(senderID, appEnv) {
@@ -146,15 +166,18 @@ function sendGreetingMessage(senderID, appEnv) {
 function sendHelpMessage(senderID, appEnv) {
   return messageSender.postTextMessage(
     senderID, '`hi             Greeting from Pusheen`\n\
-`help           The command you are seeing right now`\n\
-`button         Send Button Template`\n\
-`list           Send List Template`\n\
-`generic        Send Generic Template`\n\
-`open graph     Send Open Graph Template`\n\
-`receipt        Send Receipt Template`\n\
-`flight         Send Flight Template`\n\
-`quick reply    Send Quick Reply`\n\
-`extension      Send a web button with Extension SDK integrated`',
+`help               The command you are seeing right now`\n\
+`button             Send Button Template`\n\
+`list               Send List Template`\n\
+`generic            Send Generic Template`\n\
+`open graph         Send Open Graph Template`\n\
+`receipt            Send Receipt Template`\n\
+`flight             Send Flight Template`\n\
+`quick reply        Send Quick Reply`\n\
+`extension          Send a web button with Extension SDK integrated`\n\
+`create group       Create a group with (name recipient1 recipient2..recipientN)`\n\
+`add to group       Remove recipients from a group (t_xxxx recipient1 recipient2..recipientN)`\n\
+`remove from group  Add recipients to a group (t_xxxx recipient1 recipient2..recipientN)`',
     appEnv.token
   );
 }

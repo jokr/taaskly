@@ -16,6 +16,11 @@ class GraphRequest {
     return this;
   }
 
+  delete() {
+    this.method = 'DELETE';
+    return this;
+  }
+
   token(token) {
     this.accessToken = token;
     this.sign = true;
