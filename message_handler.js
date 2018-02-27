@@ -136,6 +136,8 @@ function handleTextMessage(senderID, messageText, appEnv) {
       return sendQuickReply(senderID, appEnv);
     case 'extension':
       return sendExtension(senderID, appEnv);
+    case 'inbox':
+      return showInbox(senderID, appEnv);
     case (command.match(/^create group \w+( \d+)+/) || {}).input:
       return createGroup(items[2], items.slice(3), appEnv);
     case (command.match(/^add to group \w+( \d+)+/) || {}).input:
@@ -145,6 +147,27 @@ function handleTextMessage(senderID, messageText, appEnv) {
     default:
       return messageSender.postTextMessage(senderID, 'Did you just say ' + messageText + '? Try "help" to find the list of commands supported!', appEnv.token);
   }
+}
+
+function showInbox(senderID, appEnv) {
+  return messageSender.inbox(appEnv.token).then(results => {
+    var result = Promise.resolve();
+
+    if (results.length == 0) {
+      result = messageSender.postTextMessage(senderID, 'No group chats', appEnv.token);
+    } else {
+      results.forEach(thread => {
+        result = result.then(x => {
+          var text = "Thread: " + thread.id + " " + (thread.name || '') + "\n";
+          thread.participants.data.forEach(participant => { text += participant.name + " (" + participant.id + ")\n" });
+          return messageSender.postTextMessage(senderID, text, appEnv.token);
+        });
+      });
+    }
+
+    return result;
+  });
+
 }
 
 function createGroup(threadName, recipients, appEnv) {
@@ -175,6 +198,7 @@ function sendHelpMessage(senderID, appEnv) {
 `flight             Send Flight Template`\n\
 `quick reply        Send Quick Reply`\n\
 `extension          Send a web button with Extension SDK integrated`\n\
+`inbox              Show bot inbox`\n\
 `create group       Create a group with (name recipient1 recipient2..recipientN)`\n\
 `add to group       Remove recipients from a group (t_xxxx recipient1 recipient2..recipientN)`\n\
 `remove from group  Add recipients to a group (t_xxxx recipient1 recipient2..recipientN)`',

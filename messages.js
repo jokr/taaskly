@@ -67,10 +67,18 @@ function postTextMessage(target, message, token) {
   return postMessage(target, messageData, token);
 }
 
+function inbox(token) {
+  return defaultToken(token).then(resolvedToken =>
+    graph('me/threads?fields=participants,name')
+      .token(resolvedToken)
+      .send()).then(response => response.data);
+}
+
 module.exports = {
   postMessage: postMessage,
   postTextMessage: postTextMessage,
   renameThread: renameThread,
   addToGroup: addToGroup,
   removeFromGroup: removeFromGroup,
+  inbox: inbox,
 };
