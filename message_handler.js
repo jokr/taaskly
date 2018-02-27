@@ -149,8 +149,8 @@ function handleTextMessage(senderID, messageText, appEnv) {
   }
 }
 
-function showGroupChats(senderID, token) {
-  return messageSender.inbox(token).then(results => {
+function showGroupChats(senderID, appEnv) {
+  return messageSender.inbox(appEnv.token).then(results => {
     var result = null;
 
     for (var thread in results) {
