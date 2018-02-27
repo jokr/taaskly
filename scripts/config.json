@@ -1,0 +1,11 @@
+{
+    "home_url": {
+        "url": "<chat_extension_landing_url>",
+        "webview_height_ratio": "tall",
+        "webview_share_button": "show",
+        "in_test": "false"
+    },
+    "whitelisted_domains": [
+        "<instance_domain>"
+    ]
+}
