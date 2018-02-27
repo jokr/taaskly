@@ -3,7 +3,6 @@
 const db = require('./db');
 const messageSender = require('./messages');
 const url = require('url');
-const graph = require('./graph');
 
 exports.handleSingleMessageEvent = function(req, messagingEvent) {
   const senderID = messagingEvent.thread ? messagingEvent.thread.id : messagingEvent.sender.id;

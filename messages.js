@@ -74,9 +74,3 @@ module.exports = {
   addToGroup: addToGroup,
   removeFromGroup: removeFromGroup,
 };
-
-// var token = "FQVJ2c1BXZAGd6U1NfTkh5NWpRNlphaVYwa0FBdnJGdVJ5WWpraUpJSE9SMDd0MzdIMVdPckhtcmwxZAW5ENzlONFhpOTZAQakNCcFJ1bFdjUmx5bVdXeUJlUlpTblFsUGpDOUVfSkNESUNFRGxsTnNzbWEyOUdIdkR0RUJqaWFaa0RHUGkwT0Y3TGZAJNVhjN04yX2RCNlhYSUNWWWRYNXBMZA3RqTVp5Wm43aWxfQWFvVGNCVzdXTVN5QXpjdlNnYk5ybXZAsUnZAR";
-// removeFromGroup("t_1773211609369648", ["100023912510021"], token).then(x =>
-// addToGroup("t_1773211609369648", ["100023912510021"], token)).then(y =>
-//   console.log("finished")
-// ).catch(e => console.log(e));
