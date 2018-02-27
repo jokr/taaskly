@@ -174,16 +174,38 @@ router.route('/unfurl_callback')
               break;
             case 'task':
               return db.models.task
-                .findById(id)
+                .findById(id, {include: [{ model: db.models.user, as: 'owner' }]})
                 .then(task => {
                   if (task === null) {
                     throw new BadRequest('No task with this id exists.');
+                  }
+                  const additionalData = [
+                    {
+                      title: 'Owner',
+                      format: 'text',
+                      value: task.owner.username,
+                    },
+                    {
+                      title: 'Created',
+                      format: 'datetime',
+                      value: task.createdAt,
+                    },
+                  ];
+                  if (task.priority !== null) {
+                    additionalData.push(
+                      {
+                        title: 'Priority',
+                        format: 'text',
+                        value: task.priority,
+                      },
+                    );
                   }
                   const data = {
                     link: change.link,
                     title: task.title,
                     privacy: 'organization',
                     type: 'task',
+                    additional_data: additionalData,
                   };
                   return {data, user};
                 });
