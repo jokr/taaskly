@@ -179,18 +179,33 @@ router.route('/unfurl_callback')
                   if (task === null) {
                     throw new BadRequest('No task with this id exists.');
                   }
-                  const additionalData = [
-                    {
-                      title: 'Owner',
-                      format: 'text',
-                      value: task.owner.username,
-                    },
+                  const additionalData = [];
+                  if (task.owner.workplaceID) {
+                    additionalData.push(
+                      {
+                        title: 'Owner',
+                        format: 'user',
+                        value: task.owner.workplaceID,
+                      },
+                    );
+                  } else {
+                    additionalData.push(
+                      {
+                        title: 'Owner',
+                        format: 'text',
+                        value: task.owner.username,
+                      },
+                    );
+                  }
+
+                  additionalData.push(
                     {
                       title: 'Created',
                       format: 'datetime',
                       value: task.createdAt,
                     },
-                  ];
+                  );
+
                   if (task.priority !== null) {
                     additionalData.push(
                       {
