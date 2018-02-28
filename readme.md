@@ -7,8 +7,8 @@ A Workplace application demonstrating account linking, file preview and composer
 Make sure you have [Node.js](http://nodejs.org/) installed.
 
 ```sh
-$ git clone git@github.com:jokr/pusheen-suite.git
-$ cd pusheen-suite
+$ git clone git@github.com:jokr/taasky.git
+$ cd taasky
 $ touch .env
 ```
 
@@ -57,7 +57,7 @@ $ heroku open
 ```
 or
 
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/jokr/pusheen-suite)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/jokr/taasky)
 
 ## Documentation
 

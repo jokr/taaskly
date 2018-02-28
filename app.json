@@ -5,8 +5,8 @@
     "workplace",
     "node"
   ],
-  "website": "https://github.com/jokr/pusheen-suite",
-  "repository": "https://github.com/jokr/pusheen-suite",
+  "website": "https://github.com/jokr/taasky",
+  "repository": "https://github.com/jokr/taasky",
   "logo": "http://thecraftchop.com/files/others/pusheen.svg",
   "success_url": "/",
   "env": {

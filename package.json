@@ -29,14 +29,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jokr/pusheen-suite.git"
+    "url": "git+https://github.com/jokr/taasky.git"
   },
   "license": "MIT",
   "author": "Joel Krebs <jokr@fb.com>",
   "bugs": {
-    "url": "https://github.com/jokr/pusheen-suite/issues"
+    "url": "https://github.com/jokr/taasky/issues"
   },
-  "homepage": "https://github.com/jokr/pusheen-suite#readme",
+  "homepage": "https://github.com/jokr/taasky#readme",
   "devDependencies": {
     "sqlite": "^2.9.1"
   }
