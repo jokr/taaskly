@@ -56,7 +56,7 @@ class GraphRequest {
       options.headers = { Authorization: `Bearer ${this.accessToken}` };
     }
 
-    if (this.method === 'POST' && this.contentBody) {
+    if ((this.method === 'POST' || this.method === 'DELETE') && this.contentBody) {
       options.body = this.contentBody;
     }
 

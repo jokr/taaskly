@@ -43,7 +43,58 @@ router.route('/subscribe')
 router.route('/communities')
   .get((req, res, next) => db.models.community
     .findAll({order: [['name', 'ASC']]})
+    .then(communities => {
+      if (process.env.APP_ID && process.env.ACCESS_TOKEN) {
+        return [{
+          id: process.env.APP_ID,
+          name: 'Custom Integration',
+          accessToken: process.env.ACCESS_TOKEN,
+          installType: 'Custom Integration'
+        }].concat(communities);
+      }
+      return communities;
+    })
+    .then(communities => Promise.all(
+      communities.map(
+        community =>
+        graph('me/messenger_profile?fields=whitelisted_domains,home_url')
+          .token(community.accessToken)
+          .send()
+          .then(result => {
+            community['config'] = result.data[0] || '';
+            return community;
+          }))))
     .then(communities => res.render('communities', {communities}))
+    .catch(next),
+  );
+
+router.route('/community/config')
+  .post((req, res, next) => db.models.community
+    .findOne({where: {id: req.body.app_id}})
+    .then(community => {
+      if (community) {
+        return community.accessToken;
+      }
+      if (process.env.APP_ID === req.body.app_id) {
+        return process.env.ACCESS_TOKEN;
+      }
+      throw new BadRequest('Unknown app id.');
+    })
+    .then(accessToken => {
+      const graphRequest = graph('me/messenger_profile')
+        .token(accessToken);
+      if (req.body.config) {
+        return graphRequest.body(JSON.parse(req.body.config)).post().send();
+      } else {
+        return graphRequest.body({
+          fields: [
+            'whitelisted_domains',
+            'home_url'
+          ]
+        }).delete().send();
+      }
+    })
+    .then(() => res.redirect('/admin/communities'))
     .catch(next),
   );
 

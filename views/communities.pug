@@ -9,6 +9,8 @@ block content
         th Name
         th Created Time
         th Access Token
+        th Install Type
+        th Config
     tbody
       each community in communities
         tr
@@ -16,3 +18,9 @@ block content
           td= community.name
           td= moment(community.createdAt).fromNow()
           td= community.accessToken.substring(0, 5) + '...'
+          td= community.installType ? community.installType : '3rd Party App'
+          td
+            form(action="/admin/community/config" method="post")
+              textarea(name="config")= JSON.stringify(community.config, null, 2)
+              input(name="app_id" value=community.id style="display:none")
+              button(type="submit") Update
