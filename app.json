@@ -1,9 +1,8 @@
 {
-  "name": "Pusheen Suite",
-  "description": "This app does everything.",
+  "name": "Taasky",
+  "description": "A sample app for Workplace demonstrating account linking, link previewing and composer integration.",
   "keywords": [
     "workplace",
-    "pusheen",
     "node"
   ],
   "website": "https://github.com/jokr/pusheen-suite",
@@ -20,7 +19,7 @@
       "value": "0123456789abcdef"
     },
     "APP_REDIRECT": {
-      "description": "todo",
+      "description": "The redirect that should handle the app installation.",
       "value": "https://XXXX.herokuapp.com/community_install"
     },
     "ACCESS_TOKEN": {
@@ -28,11 +27,11 @@
       "required": false,
     },
     "SESSION_SECRET": {
-      "description": "todo",
+      "description": "A random string that is used for crypto purposes in the session.",
       "generator": "random"
     },
     "WEBHOOK_CALLBACK": {
-      "description": "todo",
+      "description": "The callback url for webhooks.",
       "value": "https://XXXX.herokuapp.com/api/webhook"
     },
     "SALT_ROUNDS": {

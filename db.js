@@ -84,13 +84,6 @@ const Document = sequelize.define('document', {
     defaultValue: 'public',
     allowNull: false,
   },
-  icon: {
-    type: Sequelize.STRING,
-    validate: {
-      notEmpty: true,
-    },
-    allowNull: true,
-  },
 });
 
 const Community = sequelize.define('community', {

@@ -4,13 +4,31 @@ body {
 
 @media (min-width: 1000px) {
   #main {
-    margin: 200px;
+    margin: 200px auto;
+    max-width: 1400px;
   }
 }
 
 #header {
   display: flex;
   justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  padding-bottom: 10px;
+}
+
+.logo img {
+  flex-shrink: 0;
+  height: 50px;
+  width: 50px;
+  margin-right: 20px;
+}
+
+.logo h1 {
+  align-self: center;
+  margin: 0;
 }
 
 #header ul {
@@ -24,14 +42,14 @@ body {
   display: block;
   padding: 4px;
   width: 110px;
+  font-weight: bold;
 }
 
 #header .nav-item:hover {
-  background-color: #4080ff;
+  background-color: #3578e5;
 }
 
 #header .nav-item:hover a {
-  font-weight: bold;
   color: white;
 }
 
@@ -61,7 +79,7 @@ textarea {
 }
 
 a {
-  color: #4080ff;
+  color: #3578e5;
   text-decoration: none;
 }
 

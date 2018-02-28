@@ -1,4 +1,4 @@
-# Pusheen Suite
+# Taasky
 
 A Workplace application demonstrating account linking, file preview and composer integration. This models a simple document store with very simple privacy rules.
 

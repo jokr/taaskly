@@ -127,8 +127,7 @@ router.route('/unfurl_callback')
 
       const change = readChange(req.body);
 
-      const regexMatch = change.link
-        .match(/^https:\/\/pusheen-suite\.herokuapp\.com\/(document|task)\/([0-9]+)/);
+      const regexMatch = change.link.match(/\/(document|task)\/([0-9]+)/);
       if (regexMatch === null || regexMatch.length !== 3) {
         throw new BadRequest('Unknown document link');
       }
@@ -163,12 +162,8 @@ router.route('/unfurl_callback')
                     title: doc.name,
                     description: doc.content.toString().substring(0, 200),
                     privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-                    download_url: process.env.BASE_URL + 'pdf-sample.pdf',
                     type: 'doc',
                   };
-                  if (doc.icon) {
-                    data.icon = process.env.BASE_URL + doc.icon;
-                  }
                   return {data, user};
                 });
               break;

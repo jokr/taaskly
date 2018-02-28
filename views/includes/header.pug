@@ -1,3 +1,7 @@
+div.logo
+  a(href="/")
+    img(src="/taasky.png")
+  h1 Taasky
 nav#header
   ul.navigation
     if user
@@ -11,5 +15,6 @@ nav#header
       for item in navigation
         li.nav-item
           a(href=item.path)= item.name
-  .logout
-    a(href="/logout") Logout
+    if user
+      li.nav-item
+        a(href="/logout") Logout

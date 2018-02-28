@@ -1,10 +1,8 @@
 html
-  head
-    title Pusheen Suite
-    link(href="/favicon.ico" rel="icon" type="image/x-icon")
-    link(href="/style.css", rel="stylesheet", type="text/css")
+  include includes/head.pug
   body
     #main
+      include includes/header.pug
       h1 Register
       form.small(action="/register" method="post")
         label.label Username

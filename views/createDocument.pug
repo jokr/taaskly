@@ -1,8 +1,5 @@
 html
-  head
-    title Pusheen Suite
-    link(href="/favicon.ico" rel="icon" type="image/x-icon")
-    link(href="/style.css", rel="stylesheet", type="text/css")
+  include includes/head.pug
   body
     #main
       include includes/header.pug
@@ -19,9 +16,5 @@ html
         div
           input(id="privacy-restricted" type="radio" name="privacy" value="restricted")
           label(for="privacy-restricted") Restricted
-        p.label Other
-        div
-          input(id="unicorn" type="checkbox" name="unicorn" value="unicorn")
-          label(for="unicorn") Special Icon
         p
           button(type="submit") Create

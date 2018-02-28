@@ -1,10 +1,8 @@
 html
-  head
-    title Pusheen Suite
-    link(href="/favicon.ico" rel="icon" type="image/x-icon")
-    link(href="/style.css", rel="stylesheet", type="text/css")
+  include includes/head.pug
   body
     #main
+      include includes/header.pug
       h1 Login
       p Please enter your username and password.
       form.small(action="/login" method="post")
