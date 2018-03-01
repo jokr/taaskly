@@ -1,4 +1,4 @@
-# Taasky
+# taaskly
 
 A Workplace application demonstrating account linking, file preview and composer integration. This models a simple document store with very simple privacy rules.
 
@@ -7,8 +7,8 @@ A Workplace application demonstrating account linking, file preview and composer
 Make sure you have [Node.js](http://nodejs.org/) installed.
 
 ```sh
-$ git clone git@github.com:jokr/taasky.git
-$ cd taasky
+$ git clone git@github.com:jokr/taaskly.git
+$ cd taaskly
 $ touch .env
 ```
 
@@ -57,7 +57,7 @@ $ heroku open
 ```
 or
 
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/jokr/taasky)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/jokr/taaskly)
 
 ## Documentation
 

@@ -1,5 +1,5 @@
 {
-  "name": "taasky",
+  "name": "taaskly",
   "version": "0.0.1",
   "description": "A sample app for Workplace demonstrating account linking, link previewing and composer integration.",
   "engines": {
@@ -29,14 +29,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jokr/taasky.git"
+    "url": "git+https://github.com/jokr/taaskly.git"
   },
   "license": "MIT",
   "author": "Joel Krebs <jokr@fb.com>",
   "bugs": {
-    "url": "https://github.com/jokr/taasky/issues"
+    "url": "https://github.com/jokr/taaskly/issues"
   },
-  "homepage": "https://github.com/jokr/taasky#readme",
+  "homepage": "https://github.com/jokr/taaskly#readme",
   "devDependencies": {
     "sqlite": "^2.9.1"
   }

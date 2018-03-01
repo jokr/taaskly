@@ -1,13 +1,13 @@
 {
-  "name": "Taasky",
+  "name": "taaskly",
   "description": "A sample app for Workplace demonstrating account linking, link previewing and composer integration.",
   "keywords": [
     "workplace",
     "node"
   ],
-  "website": "https://github.com/jokr/taasky",
-  "repository": "https://github.com/jokr/taasky",
-  "logo": "http://thecraftchop.com/files/others/pusheen.svg",
+  "website": "https://github.com/jokr/taaskly",
+  "repository": "https://github.com/jokr/taaskly",
+  "logo": "https://taaskly.herokuapp.com/taaskly.png",
   "success_url": "/",
   "env": {
     "APP_ID": {
