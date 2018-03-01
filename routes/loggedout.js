@@ -126,7 +126,7 @@ router.route('/link_account')
     if (!req.user) {
       return res.redirect('/login');
     }
-    return res.redirect('link_account_confirm');
+    return res.redirect('/link_account_confirm');
   });
 
 module.exports = router;
