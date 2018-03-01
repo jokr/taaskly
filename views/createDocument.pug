@@ -1,20 +1,18 @@
-html
-  include includes/head.pug
-  body
-    #main
-      include includes/header.pug
-      h1 Create a New Document
-      form(action="/document/create" method="post")
-        label.label Name
-          input(type="text" name="name" required)
-        label.label Content
-          textarea(name="content")
-        p.label Privacy
-        div
-          input(id="privacy-public" type="radio" name="privacy" value="public" checked)
-          label(for="privacy-public") Public
-        div
-          input(id="privacy-restricted" type="radio" name="privacy" value="restricted")
-          label(for="privacy-restricted") Restricted
-        p
-          button(type="submit") Create
+extends layout
+
+block content
+  h2 Create a New Document
+  form(action="/document/create" method="post")
+    label.label Name
+      input(type="text" name="name" required)
+    label.label Content
+      textarea(name="content")
+    p.label Privacy
+    .input-group
+      input(id="privacy-public" type="radio" name="privacy" value="public" checked)
+      label(for="privacy-public") Public
+    .input-group
+      input(id="privacy-restricted" type="radio" name="privacy" value="restricted")
+      label(for="privacy-restricted") Restricted
+    p
+      button(type="submit") Create

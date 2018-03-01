@@ -1,20 +1,23 @@
-html
-  include includes/head.pug
-  body
-    #main
-      include includes/header.pug
-      h1 All Users
-      p.
-        A list of all users.
-      table.users
-        thead
-          tr
-            th(style="width: 50px") ID
-            th(style="width: 200px") Workplace ID
-            th Name
-        tbody
-          each user in users
-            tr
-              td= user.id
-              td= user.workplaceID
-              td= user.username
+extends layout
+
+block content
+  h2 All Users
+  table.users
+    thead
+      tr
+        th(style="width: 50px") ID
+        th(style="width: 200px") Workplace ID
+        th Name
+        th(style="width: 200px")
+    tbody
+      each user in users
+        tr
+          td= user.id
+          td= user.workplaceID
+          td= user.username
+          td.actions
+            form(action=`/admin/user/${user.id}/delete` method="post")
+              button(type="submit") Delete
+            if user.workplaceID
+              form(action=`/admin/user/${user.id}/unlink` method="post")
+                button(type="submit") Unlink

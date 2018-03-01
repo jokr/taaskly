@@ -1,34 +1,41 @@
 body {
-  font-family: sans-serif;
+  font-family: 'Roboto', sans-serif;
+  margin: 200px auto;
+  max-width: 1200px;
+  font-size: 18px;
 }
 
-@media (min-width: 1000px) {
-  #main {
-    margin: 200px auto;
-    max-width: 1400px;
-  }
+a {
+  color: #3578e5;
+  text-decoration: none;
 }
 
-#header {
-  display: flex;
-  justify-content: space-between;
+pre {
+  font-size: 14px;
 }
 
 .logo {
   display: flex;
-  padding-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .logo img {
-  flex-shrink: 0;
   height: 50px;
-  width: 50px;
   margin-right: 20px;
+  width: 50px;
 }
 
 .logo h1 {
   align-self: center;
+  color: #333;
+  font-size: 42px;
   margin: 0;
+}
+
+#header {
+  background-color: #333;
+  font-weight: bold;
+  font-size: 18px;
 }
 
 #header ul {
@@ -38,23 +45,18 @@ body {
   padding: 0;
 }
 
-#header li a, #header li.user {
+#header li a, #header .user {
+  color: white;
   display: block;
-  padding: 4px;
-  width: 110px;
-  font-weight: bold;
+  padding: 8px 24px;
 }
 
 #header .nav-item:hover {
   background-color: #3578e5;
 }
 
-#header .nav-item:hover a {
-  color: white;
-}
-
-nav li:hover a {
-  color: white;
+#main {
+  margin: 8px;
 }
 
 form.small {
@@ -70,7 +72,21 @@ form.small {
 input[type=text], input[type=password], textarea  {
   margin-top: 2px;
   width: 100%;
-  padding: 5px;
+  padding: 8px;
+}
+
+button {
+  background-color: #3578e5;
+  border: 0;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 12px;
+}
+
+button:hover {
+  background-image: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));
 }
 
 textarea {
@@ -78,9 +94,8 @@ textarea {
   resize: none;
 }
 
-a {
-  color: #3578e5;
-  text-decoration: none;
+.input-group {
+  display: flex;
 }
 
 table {
@@ -92,17 +107,35 @@ table thead {
   text-align: left;
 }
 
+thead tr {
+  background-color: #E8E8E8;
+}
+
 table tbody tr:hover {
   background-color: #E8E8E8;
 }
 
-table td, table th {
+table th, table td {
   padding: 10px;
 }
 
-td a {
-  display: block;
+.link-table td {
+  padding: 0;
+}
+
+.link-table td a {
+  padding: 10px;
   color: black;
+  display: block;
+  min-height: 19px;
+}
+
+p.document {
+  text-align: justify;
+}
+
+#cpy {
+  cursor: pointer;
 }
 
 .pusheen {
@@ -112,6 +145,12 @@ td a {
 .meta {
   font-size: .8rem;
   font-weight: bold;
+}
+
+.actions form {
+  display: inline-block;
+  margin-right: 8px;
+  margin-bottom: 0;
 }
 
 .task {

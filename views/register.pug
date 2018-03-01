@@ -1,12 +1,10 @@
-html
-  include includes/head.pug
-  body
-    #main
-      include includes/header.pug
-      h1 Register
-      form.small(action="/register" method="post")
-        label.label Username
-          input(type="text" name="username" required)
-        label.label Password
-          input(type="password" name="password" required)
-        button(type="submit") Register
+extends layout
+
+block content
+  h2 Register
+  form.small(action="/register" method="post")
+    label.label Username
+      input(type="text" name="username" required)
+    label.label Password
+      input(type="password" name="password" required)
+    button(type="submit") Register

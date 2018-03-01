@@ -1,28 +1,26 @@
-html
-  include includes/head.pug
-  body
-    #main
-      include includes/header.pug
-      h1 All Tasks
-      p.
-        A list of all tasks.
-      p
-        a(href="/task/create") New Task
-      table.users
-        thead
-          tr
-            th ID
-            th Owner
-            th Priority
-            th Title
-        tbody
-          each task in tasks
-            tr
-              td(style="width: 50px")
-                a(href=`/task/${task.id}`)= task.id
-              td(style="width: 100px")
-                a(href=`/task/${task.id}`)= task.owner.username
-              td(style="width: 100px")
-                a.task(class=`task-${task.priority}` href=`/task/${task.id}`)= task.priority
-              td
-                a(href=`/task/${task.id}`)= task.title
+extends layout
+
+block content
+  h2 All Tasks
+  p.
+    A list of all tasks.
+  p
+    a(href="/task/create") New Task
+  table.users
+    thead
+      tr
+        th ID
+        th Owner
+        th Priority
+        th Title
+    tbody.link-table
+      each task in tasks
+        tr
+          td(style="width: 50px")
+            a(href=`/task/${task.id}`)= task.id
+          td(style="width: 100px")
+            a(href=`/task/${task.id}`)= task.owner.username
+          td(style="width: 100px")
+            .task(class=`task-${task.priority}`)= task.priority
+          td
+            a(href=`/task/${task.id}`)= task.title

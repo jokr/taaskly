@@ -1,10 +1,11 @@
-html
-  include includes/head.pug
-  body
-    #main
-      h1 Link Account with #{community.name}
-      p.
-        Would you link your taaskly Account #{user.username} with the
-        Workplace community #{community.name}?
-      form(action="/link_account_confirm" method="post")
-        button(type="submit").confirm Link Account
+extends layout
+
+block navigation
+
+block content
+  h2 Link Account with #{community.name}
+  p.
+    Would you link your taaskly Account #{user.username} with the
+    Workplace community #{community.name}?
+  form(action="/link_account_confirm" method="post")
+    button(type="submit") Link Account

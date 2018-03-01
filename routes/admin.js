@@ -66,4 +66,19 @@ router.route('/delete_callbacks')
     .then(() => res.redirect('/admin/callbacks')),
   );
 
+router.route('/user/:id/unlink')
+  .post((req, res, next) => db.models.user
+    .findById(req.params.id)
+    .then(user => user.set('workplaceID', null).save())
+    .then(() => res.redirect('/admin/users'))
+    .catch(next),
+  );
+
+router.route('/user/:id/delete')
+  .post((req, res, next) => db.models.user
+    .destroy({ where: {id: req.params.id}})
+    .then(() => res.redirect('/admin/users'))
+    .catch(next),
+  );
+
 module.exports = router;

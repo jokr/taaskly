@@ -1,25 +1,23 @@
-html
-  include includes/head.pug
-  body
-    #main
-      include includes/header.pug
-      h1 Recent Callbacks
-      p.
-        A list of all raw webhook callbacks.
-      form(action="/admin/delete_callbacks" method="post")
-        button(type="submit") Clear
+extends layout
 
-      table.callbacks
-        thead
-          tr
-            th Time
-            th Headers
-            th Body
-        tbody
-          each callback in callbacks
-            tr
-              td= moment(callback.createdAt).fromNow()
-              td
-                pre= JSON.stringify(callback.headers, null, 2)
-              td
-                pre= JSON.stringify(callback.body, null, 2)
+block content
+  h2 Recent Callbacks
+  p.
+    A list of all raw webhook callbacks.
+  form(action="/admin/delete_callbacks" method="post")
+    button(type="submit") Clear
+
+  table.callbacks
+    thead
+      tr
+        th Time
+        th Headers
+        th Body
+    tbody
+      each callback in callbacks
+        tr
+          td= moment(callback.createdAt).fromNow()
+          td
+            pre= JSON.stringify(callback.headers, null, 1)
+          td
+            pre= JSON.stringify(callback.body, null, 1)

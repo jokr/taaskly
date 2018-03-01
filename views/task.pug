@@ -1,10 +1,19 @@
-html
-  include includes/head.pug
-  body
-    #main
-      include includes/header.pug
-      h1= task.title
-      if task.priority
-        p
-          .task(class=`task-${task.priority}`)= task.priority
-      p.meta Created by #{task.owner.username} #{moment(task.createdAt).fromNow()}
+extends layout
+
+block head
+  script(src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js")
+
+block content
+  h2= task.title
+  div
+    a#cpy Copy link
+  if task.priority
+    p
+      .task(class=`task-${task.priority}`)= task.priority
+  p.meta Created by #{task.owner.username} #{moment(task.createdAt).fromNow()}
+  script.
+    new ClipboardJS('#cpy', {
+      text: function(trigger) {
+        return document.location.href;
+      }
+    });

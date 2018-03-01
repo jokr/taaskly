@@ -1,9 +1,18 @@
-html
-  include includes/head.pug
-  body
-    #main
-      include includes/header.pug
-      h1= document.name
-      p= document.content
-      p.meta Created by #{document.owner.username} #{moment(document.createdAt).fromNow()}
-      p.meta= document.privacy
+extends layout
+
+block head
+  script(src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js")
+
+block content
+  h2= document.name
+  div
+    a#cpy Copy link
+  p.document= document.content
+  p.meta Created by #{document.owner.username} #{moment(document.createdAt).fromNow()}
+  p.meta= document.privacy
+  script.
+    new ClipboardJS('#cpy', {
+      text: function(trigger) {
+        return document.location.href;
+      }
+    });

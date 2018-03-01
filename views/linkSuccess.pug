@@ -1,15 +1,15 @@
-html
-  head
-    title taaskly
-    link(href="/favicon.ico" rel="icon" type="image/x-icon")
-    link(href="/style.css", rel="stylesheet", type="text/css")
-    meta(http-equiv="refresh" content="3;url="+redirect)
-  body
-    #main
-      h1 Account Linked
-      p.
-        Your taaskly account #{user.username} was successfully linked to the 
-        Workplace user id #{user.workplaceID}.
-      p.
-        This site will redirect back to Workplace in 3 seconds:
-      pre= redirect
+extends layout
+
+block head
+  meta(http-equiv="refresh" content="3;url="+redirect)
+    
+block navigation
+
+block content
+  h1 Account Linked
+  p.
+    Your Taaskly account #{user.username} was successfully linked to the 
+    Workplace user id #{user.workplaceID}.
+  p.
+    This site will redirect back to Workplace in 3 seconds:
+  pre= redirect

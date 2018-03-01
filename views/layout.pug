@@ -1,0 +1,31 @@
+html
+  head
+    title Taaskly
+    link(href="/favicon.ico?v=2" rel="icon" type="image/x-icon")
+    link(href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet")
+    link(href="/style.css" rel="stylesheet" type="text/css")
+    block head
+  body
+    .logo
+      a(href="/")
+        img(src="/taaskly.png")
+      h1 Taaskly
+    block navigation
+      nav#header
+        ul.navigation
+          if user
+            li.user= user.username
+          else
+            li.nav-item
+              a(href="/login") Login
+            li.nav-item
+              a(href="/register") Register
+          if navigation
+            for item in navigation
+              li.nav-item
+                a(href=item.path)= item.name
+          if user
+            li.nav-item
+              a(href="/logout") Logout
+    #main
+      block content

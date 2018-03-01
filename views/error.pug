@@ -1,12 +1,11 @@
-html
-  include includes/head.pug
-  body
-    #main
-      if header
-        h1= header
-      else
-        h1 Oh no, an error occurred
-      p=message
-      pre=details
-      p.pusheen
-        img(src="/sad.png")
+extends layout
+
+block content
+  if header
+    h2= header
+  else
+    h2 Oh no, an error occurred
+  p=message
+  pre=details
+  p.pusheen
+    img(src="/sad.png")
