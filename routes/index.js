@@ -1,5 +1,6 @@
 'use strict';
 
+const basicAuth = require('express-basic-auth');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const logger = require('heroku-logger');
@@ -55,8 +56,15 @@ router.use((req, res, next) => {
   next();
 });
 
-router.use(loggedout);
+const auth = basicAuth({
+  authorizer: (username, password) => password === process.env.MASTER_PASSWORD,
+  challenge: true,
+  realm: 'taaskly',
+});
+
 router.use('/api', api);
+router.use(auth);
+router.use(loggedout);
 router.use(loginRedirect);
 router.use(authenticated);
 router.use('/admin', forceAdmin, admin);
