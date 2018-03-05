@@ -1,5 +1,6 @@
 'use strict';
 
+const basicAuth = require('express-basic-auth');
 const bodyParser = require('body-parser');
 const env = require('node-env-file');
 const express = require('express');
@@ -18,6 +19,11 @@ app.set('port', (process.env.PORT || 5000));
 app.set('view engine', 'pug');
 app.set('json spaces', 2);
 
+app.use(basicAuth({
+  authorizer: (username, password) => password === process.env.MASTER_PASSWORD,
+  challenge: true,
+  realm: 'taaskly',
+}));
 app.use(express.static('static'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({

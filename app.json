@@ -41,6 +41,10 @@
     "BASE_URL": {
       "description": "Base url for the application",
       "value": "https://XXXX.herokuapp.com/"
+    },
+    "MASTER_PASSWORD": {
+      "description": "Master password that gates access to the entire site.",
+      "generator": "random"
     }
   },
   "formation": {
