@@ -88,6 +88,9 @@ function readMessaging(body) {
   return body.entry[0].messaging[0];
 }
 
+router.route('/extension')
+  .get((req, res, next) => res.render('extension'));
+
 router.route('/message_callback')
   .get(processChallenge)
   .post(

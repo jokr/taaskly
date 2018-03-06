@@ -270,7 +270,7 @@ function sendExtension(senderID, appEnv) {
   const extensionURL = url.format({
       protocol: 'https',
       host: appEnv.host,
-      pathname: 'extension',
+      pathname: 'api/extension',
       search: 'appID=' + appEnv.appID,
   });
   return messageSender.postMessage(

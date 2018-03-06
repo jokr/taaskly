@@ -15,9 +15,6 @@ const router = express.Router();
 router.route('/')
   .get((req, res, next) => res.render('home'));
 
-router.route('/extension')
-  .get((req, res, next) => res.render('extension'));
-
 router.route('/login')
   .get((req, res, next) => res.render('login'))
   .post(
