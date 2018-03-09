@@ -152,7 +152,7 @@ router.route('/unfurl_callback')
                   if (doc === null) {
                     throw new BadRequest('No document with this id exists.');
                   }
-                  if (doc.privacy !== 'public' && doc.ownerId !== user.id) {
+                  if (doc.privacy !== 'public' && (user === null || doc.ownerId !== user.id)) {
                     return res
                       .status(200)
                       .json({
