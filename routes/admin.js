@@ -63,7 +63,13 @@ router.route('/communities')
           .then(result => {
             community['config'] = result.data[0] || '';
             return community;
-          }))))
+          })
+          .catch(() => {
+            return community;
+          })
+        )
+      )
+    )
     .then(communities => res.render('communities', {communities}))
     .catch(next),
   );
