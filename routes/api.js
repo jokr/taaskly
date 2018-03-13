@@ -1,5 +1,6 @@
 'use strict';
 
+const base64url = require('base64url');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const express = require('express');
@@ -235,6 +236,11 @@ router.route('/unfurl_callback')
 
 router.route('/community_uninstall')
   .post((req, res, next) => {
+    db.models.callback
+      .create({ path: req.originalUrl, headers: req.headers, body: req.body })
+      .then()
+      .catch(error => logger.warn(error));
+
     if (!req.body.signed_request) {
       return res
         .status(400)
