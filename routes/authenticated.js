@@ -137,7 +137,7 @@ router.route('/link_account_confirm')
             {message: `This user is already linked to somebody else.`},
           );
       }
-      return res.render('linkAccount', {community});
+      return res.render('linkAccount', {community, signedRequest});
     })
     .catch(next);
   })

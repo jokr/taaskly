@@ -22,7 +22,6 @@ function loginRedirect(req, res, next) {
 }
 
 function forceAdmin(req, res, next) {
-  console.log('yolo', req.isAdmin);
   if (req.isAdmin) {
     next();
   } else {

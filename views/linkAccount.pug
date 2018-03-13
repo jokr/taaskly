@@ -9,3 +9,4 @@ block content
     Workplace community #{community.name}?
   form(action="/link_account_confirm" method="post")
     button(type="submit") Link Account
+  pre.debug= JSON.stringify(signedRequest, null, 2)

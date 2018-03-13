@@ -174,3 +174,7 @@ p.document {
 .task-low {
   background-color: #f0c850;
 }
+
+.debug {
+  font-size: .8rem;
+}
