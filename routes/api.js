@@ -233,6 +233,38 @@ router.route('/unfurl_callback')
         .catch(next);
     });
 
+router.route('/community_uninstall')
+  .post((req, res, next) => {
+    if (!req.body.signed_request) {
+      return res
+        .status(400)
+        .render('error', {message: `No signed request sent.`});
+    }
+    const parts = req.body.signed_request.split('.');
+    if (parts.length !== 2) {
+      return res
+        .status(400)
+        .render('error', {message: `Signed request is malformatted: ${req.body.signed_request}`});
+    }
+    const [signature, payload] = parts.map(value => base64url.decode(value));
+    const expectedSignature = crypto.createHmac('sha256', process.env.APP_SECRET)
+      .update(parts[1])
+      .digest('hex');
+    if (expectedSignature !== signature) {
+      return res
+        .status(400)
+        .render(
+          'error',
+          {message: `Signed request does not match. Expected ${expectedSignature} but got ${signature}.`},
+        );
+    }
+    const decodedPayload = JSON.parse(payload);
+    db.models.community
+      .destroy({ where: {id: decodedPayload.community_id}})
+      .then(() => res.status(200).send())
+      .catch(next);
+  });
+
 router.use('*', (req, res, next) => res.status(404).send());
 router.use(errorHandler);
 
