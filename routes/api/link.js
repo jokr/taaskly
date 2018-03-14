@@ -56,7 +56,7 @@ function handlePreview(change) {
                 return {data: [], user};
               }
               return {
-                data: {
+                data: [{
                   link: change.link,
                   title: doc.name,
                   description: doc.content.toString().substring(0, 200),
@@ -65,7 +65,7 @@ function handlePreview(change) {
                   canonical_link: `${process.env.BASE_URL}document/${doc.id}`,
                   download_url: `${process.env.BASE_URL}download/${doc.id}/`,
                   type: 'doc',
-                },
+                }],
                 user,
               };
             });
@@ -110,6 +110,11 @@ function handlePreview(change) {
                     title: 'Priority',
                     format: 'text',
                     value: task.priority,
+                    color: task.priority === 'high'
+                      ? 'red'
+                      : task.priority === 'medium'
+                      ? 'orange'
+                      : 'blue',
                   },
                 );
               }
@@ -121,7 +126,7 @@ function handlePreview(change) {
                 additional_data: additionalData,
                 icon: `${process.env.BASE_URL}taaskly-icon.png`,
               };
-              return {data, user};
+              return {data: [data], user};
             });
           break;
         default:
