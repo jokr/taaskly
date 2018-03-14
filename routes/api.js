@@ -166,6 +166,7 @@ router.route('/unfurl_callback')
                     title: doc.name,
                     description: doc.content.toString().substring(0, 200),
                     privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+                    icon: `${process.env.BASE_URL}taaskly-icon.png`,
                     type: 'doc',
                   };
                   return {data, user};
@@ -220,6 +221,7 @@ router.route('/unfurl_callback')
                     privacy: 'organization',
                     type: 'task',
                     additional_data: additionalData,
+                    icon: `${process.env.BASE_URL}taaskly-icon.png`,
                   };
                   return {data, user};
                 });
