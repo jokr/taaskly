@@ -37,9 +37,10 @@ function errorHandler(err, req, res, next) {
 const router = express.Router();
 
 router.use((req, res, next) => {
-  req.isAdmin = req.user && req.user.id === 1;
+  const adminID = parseInt(process.env.ADMIN_ID) || 1;
+  req.isAdmin = req.user && (req.user.id === adminID);
   next();
-})
+});
 
 router.use((req, res, next) => {
   const navigation = [];

@@ -7,6 +7,7 @@ block content
       tr
         th(style="width: 50px") ID
         th(style="width: 200px") Workplace ID
+        th(style="width: 200px") Community
         th Name
         th(style="width: 200px")
     tbody
@@ -14,6 +15,7 @@ block content
         tr
           td= user.id
           td= user.workplaceID
+          td= user.community ? user.community.name : ''
           td= user.username
           td.actions
             form(action=`/admin/user/${user.id}/delete` method="post")

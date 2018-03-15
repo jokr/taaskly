@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const express = require('express');
 const logger = require('heroku-logger');
+const Op = require('sequelize').Sequelize.Op;
 
 const db = require('../db');
 const messages = require('../messages');
@@ -148,28 +149,27 @@ router.route('/unfurl_callback')
           switch (regexMatch[1]) {
             case 'document':
               return db.models.document
-                .findById(id)
+                .findById(id, {where: {
+                  [Op.or]: {
+                    privacy: 'public',
+                    ownerId: user ? user.id : null,
+                  },
+                }})
                 .then(doc => {
                   if (doc === null) {
-                    throw new BadRequest('No document with this id exists.');
+                    return {data: [], user};
                   }
-                  if (doc.privacy !== 'public' && (user === null || doc.ownerId !== user.id)) {
-                    return res
-                      .status(200)
-                      .json({
-                        data: [],
-                        linked_user: user !== null,
-                      });
-                  }
-                  const data = {
-                    link: change.link,
-                    title: doc.name,
-                    description: doc.content.toString().substring(0, 200),
-                    privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-                    icon: `${process.env.BASE_URL}taaskly-icon.png`,
-                    type: 'doc',
+                  return {
+                    data: {
+                      link: change.link,
+                      title: doc.name,
+                      description: doc.content.toString().substring(0, 200),
+                      privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+                      icon: `${process.env.BASE_URL}taaskly-icon.png`,
+                      type: 'doc',
+                    },
+                    user,
                   };
-                  return {data, user};
                 });
               break;
             case 'task':
@@ -231,7 +231,9 @@ router.route('/unfurl_callback')
           }
         })
         .then(response => {
-          res.status(200).json({data: [response.data], linked_user: response.data !== null});
+          res
+            .status(200)
+            .json({data: [response.data], linked_user: response.user !== null});
         })
         .catch(next);
     });

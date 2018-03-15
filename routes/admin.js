@@ -106,7 +106,7 @@ router.route('/community/config')
 
 router.route('/users')
   .get((req, res, next) => db.models.user
-    .findAll({order: [['createdAt', 'DESC']]})
+    .findAll({order: [['createdAt', 'DESC']], include: [{ model: db.models.community, as: 'community' }]})
     .then(users => res.render('users', {users})),
   );
 

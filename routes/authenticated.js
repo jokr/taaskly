@@ -151,8 +151,10 @@ router.route('/link_account_confirm')
       const redirect = signedRequest.redirect;
       delete req.session.signedRequest;
       return req.user
-        .set('workplaceID', signedRequest.user_id)
-        .save()
+        .update({
+          workplaceID: signedRequest.user_id,
+          communityId: community.id,
+        })
         .then(user => res.render('linkSuccess', {redirect}));
     })
     .catch(next);

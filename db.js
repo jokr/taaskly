@@ -127,7 +127,7 @@ const Callback = sequelize.define('callback', {
 
 Document.belongsTo(User, { as: 'owner',  foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
 Task.belongsTo(User, { as: 'owner', foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
-User.belongsTo(Community);
+User.belongsTo(Community, { as: 'community', foreignKey: { allowNull: true }, onDelete: 'SET NULL'});
 
 let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() === 'true';
 
