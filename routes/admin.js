@@ -57,7 +57,7 @@ router.route('/communities')
     .then(communities => Promise.all(
       communities.map(
         community =>
-        graph('me/messenger_profile?fields=whitelisted_domains,home_url')
+        graph('me/messenger_profile?fields=whitelisted_domains,home_url,account_linking_url,persistent_menu,get_started,greeting')
           .token(community.accessToken)
           .send()
           .then(result => {
