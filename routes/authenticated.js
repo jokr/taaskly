@@ -43,35 +43,44 @@ router.route('/document/create')
   );
 
 router.route('/document/:id')
-  .get((req, res, next) => db.models.document
-    .findById(req.params.id, {include: [{model: db.models.user, as: 'owner'}]})
-    .then(document => {
-      if (!document) {
-        return res
-          .status(404)
-          .render(
-            'error',
-            {
-              header: 'Document does not exist',
-              message: 'The document you requested does not seem to exist.',
-            },
-          );
-      }
-      if (document.privacy === 'restricted' && req.user.id !== document.owner.id) {
-        return res
-          .status(403)
-          .render(
-            'error',
-            {
-              header: 'Document is private',
-              message: 'This document is private.',
-            },
-          );
-      }
-      return res.render('document', {document});
-    })
-    .catch(next),
-  );
+  .get((req, res, next) => Promise.all([
+    db.models.document.findById(
+      req.params.id, {
+        include: [{model: db.models.user, as: 'owner'}],
+        where: {
+          [Op.or]: {
+            privacy: 'public',
+            ownerId: req.user.id,
+          },
+        },
+      },
+    ),
+    req.user.community === null
+      ? Promise.resolve(null)
+      : graph('')
+          .token(req.user.community.accessToken)
+          .qs({
+            id: `${process.env.BASE_URL}document/${req.params.id}`,
+            fields: 'id,sharedposts{id,story,message,privacy,created_time,permalink_url,from{id,name,link,picture},target{id}}',
+          })
+          .send(),
+  ])
+  .catch(next)
+  .then(result => {
+    const [document, sharedposts] = result;
+    if (!document) {
+      return res
+        .status(404)
+        .render(
+          'error',
+          {
+            header: 'Document does not exist',
+            message: 'The document you requested does not seem to exist.',
+          },
+        );
+    }
+    return res.render('document', {document, sharedposts});
+  }));
 
 router.route('/tasks')
   .get((req, res, next) => db.models.task

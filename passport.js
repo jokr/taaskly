@@ -33,7 +33,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((id, done) => {
   db.models.user
-    .findById(id)
+    .findById(id, {include: [{model: db.models.community, as: 'community'}]})
     .then(user => done(null, user))
     .catch(err => done(err));
 });

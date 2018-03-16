@@ -10,6 +10,7 @@ block content
   p.document= document.content
   p.meta Created by #{document.owner.username} #{moment(document.createdAt).fromNow()}
   p.meta= document.privacy
+  pre= JSON.stringify(sharedposts, null, 2)
   script.
     new ClipboardJS('#cpy', {
       text: function(trigger) {

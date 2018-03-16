@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const express = require('express');
 const logger = require('heroku-logger');
-const Op = require('sequelize').Sequelize.Op;
+const Op = require('sequelize').Op;
 
 const db = require('../db');
 const messages = require('../messages');

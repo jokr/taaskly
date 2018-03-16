@@ -130,11 +130,14 @@ Task.belongsTo(User, { as: 'owner', foreignKey: { allowNull: false }, onDelete: 
 User.belongsTo(Community, { as: 'community', foreignKey: { allowNull: true }, onDelete: 'SET NULL'});
 
 let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() === 'true';
+let sync = process.env.SYNC_TABLES && process.env.SYNC_TABLES.toLowerCase() === 'true';
 
-Promise.all([Community.sync({force}), Callback.sync({force})])
-  .then(() => User.sync({force}))
-  .then(() => Promise.all([Document.sync({force}), Task.sync({force})]))
-  .then(() => logger.info('Table sync complete.'))
-  .catch(err => logger.error(err));
+if (sync || force) {
+  Promise.all([Community.sync({force}), Callback.sync({force})])
+    .then(() => User.sync({force}))
+    .then(() => Promise.all([Document.sync({force}), Task.sync({force})]))
+    .then(() => logger.info('Table sync complete.'))
+    .catch(err => logger.error(err));
+}
 
 module.exports = sequelize;
