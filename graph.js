@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const logger = require('heroku-logger')
 const request = require('request-promise');
 
-const baseURL = 'https://graph.jokr.sb.facebook.com';
+const baseURL = 'https://graph.facebook.com';
 
 class GraphRequest {
   constructor(path) {
