@@ -4,9 +4,10 @@ block head
   script(src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js")
 
 block content
-  h2= document.name
-  div
+  .file-actions
     a#cpy Copy link
+    a(href="/download/"+document.id+"/") Download
+  h2= document.name
   p.document= document.content
   p.meta Created by #{document.owner.username} #{moment(document.createdAt).fromNow()}
   p.meta= document.privacy

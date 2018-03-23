@@ -6,6 +6,8 @@ const crypto = require('crypto');
 const express = require('express');
 const logger = require('heroku-logger');
 const passport = require('passport');
+const pdf = require('html-pdf');
+const pug = require('pug');
 
 const db = require('../db');
 const graph = require('../graph');
@@ -125,5 +127,42 @@ router.route('/link_account')
     }
     return res.redirect('/link_account_confirm');
   });
+
+router.route('/download/:id')
+  .get((req, res, next) => db.models.document.findById(
+      req.params.id, {
+        include: [{model: db.models.user, as: 'owner'}],
+      },
+    )
+    .then(document => {
+      const html = pug.compileFile('./views/pdf.pug');
+      pdf
+        .create(
+          html({document}),
+          {
+            border: {
+              top: '15mm',
+              right: '10mm',
+              bottom: '15mm',
+              left: '10mm',
+            },
+            footer: {
+              height: '10mm',
+              contents: {
+                default: document.owner.username,
+              },
+            },
+          },
+        )
+        .toStream((err, stream) => {
+          if (err) {
+            return next(err);
+          }
+          res.attachment('taaskly-doc.pdf');
+          stream.pipe(res);
+        });
+    })
+    .catch(next),
+  );
 
 module.exports = router;

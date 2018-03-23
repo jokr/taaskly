@@ -3,7 +3,6 @@
 const express = require('express');
 const logger = require('heroku-logger');
 const Op = require('sequelize').Op;
-
 const db = require('../db');
 const graph = require('../graph');
 const messages = require('../messages');
