@@ -166,6 +166,7 @@ router.route('/unfurl_callback')
                       description: doc.content.toString().substring(0, 200),
                       privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
                       icon: `${process.env.BASE_URL}taaskly-icon.png`,
+                      download_url: `${process.env.BASE_URL}download/${doc.id}/`,
                       type: 'doc',
                     },
                     user,
