@@ -192,6 +192,7 @@ p.document {
   font-size: 14px;
   font-weight: bold;
   padding: 8px 12px;
+  min-width: 60px;
 }
 
 .file-actions a:hover {

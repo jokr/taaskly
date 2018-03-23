@@ -13,8 +13,13 @@ block content
   p.meta= document.privacy
   pre= JSON.stringify(sharedposts, null, 2)
   script.
-    new ClipboardJS('#cpy', {
+    const clip = new ClipboardJS('#cpy', {
       text: function(trigger) {
         return document.location.href;
       }
+    });
+    clip.on('success', e => {
+      const previousHTML = e.trigger.innerHTML;
+      e.trigger.innerHTML = 'Copied';
+      setTimeout(() => e.trigger.innerHTML = previousHTML, 2000);
     });
