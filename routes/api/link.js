@@ -124,6 +124,39 @@ function handlePreview(change) {
     });
 }
 
+function handleCollection(change) {
+  return db.models.community
+    .findById(parseInt(change.community.id))
+    .then(community => {
+      if (community === null) {
+        throw new BadRequest('Unknown community.');
+      }
+      return db.models.user.findOne({where: {workplaceID: change.user.id}});
+    })
+    .then(user => db.models.document
+      .findAll({where: {
+        [Op.or]: {
+          privacy: 'public',
+          ownerId: user ? user.id : null,
+        },
+      }})
+      .then(documents => {
+        const data = documents.map(doc => {
+          return {
+            link: `${process.env.BASE_URL}document/${doc.id}`,
+            title: doc.name,
+            description: doc.content.toString().substring(0, 200),
+            privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+            icon: `${process.env.BASE_URL}taaskly-icon.png`,
+            download_url: `${process.env.BASE_URL}download/${doc.id}/`,
+            type: 'doc',
+          };
+        });
+        return {data, user};
+      }),
+    );
+}
+
 router.route('/callback')
   .post((req, res, next) => {
     if (req.body.object !== 'link') {
@@ -137,16 +170,18 @@ router.route('/callback')
       case 'preview':
         handler = handlePreview(change.value);
         break;
+      case 'collection':
+        handler = handleCollection(change.value);
+        break;
     }
     if (handler === null) {
       throw new BadRequest('No handler for change.');
     }
     handler
       .then(response => {
-        logger.warn(response);
         res
           .status(200)
-          .json({data: [response.data], linked_user: response.user !== null});
+          .json({data: response.data, linked_user: response.user !== null});
       })
       .catch(next);
   });
