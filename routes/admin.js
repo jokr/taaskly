@@ -31,9 +31,9 @@ router.route('/subscribe')
     .appSecret()
     .qs({
       object: 'link',
-      callback_url: process.env.WEBHOOK_CALLBACK,
+      callback_url: process.env.LINK_WEBHOOK_CALLBACK,
       verify_token: process.env.VERIFY_TOKEN,
-      fields: ['preview'],
+      fields: ['preview','collection'],
     })
     .send()
     .then(() => res.redirect('/admin'))
