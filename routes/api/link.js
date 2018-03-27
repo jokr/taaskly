@@ -33,19 +33,24 @@ function handlePreview(change) {
       if (community === null) {
         throw new BadRequest('Unknown community.');
       }
+      logger.warn(change.user.id);
       return db.models.user.findOne({where: {workplaceID: change.user.id}});
     })
     .then(user => {
+      logger.warn(user);
       const id = parseInt(regexMatch[2]);
       switch (regexMatch[1]) {
         case 'document':
           return db.models.document
-            .findById(id, {where: {
-              [Op.or]: {
-                privacy: 'public',
-                ownerId: user ? user.id : null,
+            .findOne({
+              where: {
+                id: id,
+                [Op.or]: {
+                  privacy: 'public',
+                  ownerId: user ? user.id : null,
+                },
               },
-            }})
+            })
             .then(doc => {
               if (doc === null) {
                 return {data: [], user};
