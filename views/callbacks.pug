@@ -10,14 +10,16 @@ block content
   table.callbacks
     thead
       tr
-        th Time
-        th Headers
+        th(style="width: 150px") Time
+        th(style="width: 200px") Path
+        th(style="width: 500px") Headers
         th Body
     tbody
       each callback in callbacks
         tr
           td= moment(callback.createdAt).fromNow()
+          td= callback.path
           td
-            pre= JSON.stringify(callback.headers, null, 1)
+            pre= JSON.stringify(callback.headers, null, 2)
           td
-            pre= JSON.stringify(callback.body, null, 1)
+            pre= JSON.stringify(callback.body, null, 2)
