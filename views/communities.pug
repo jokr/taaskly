@@ -2,6 +2,9 @@ extends layout
 
 block content
   h2 All Communities
+  .community-actions
+    - const installURL = `https://work.facebook.com/work/admin/?section=apps&app_id=${process.env.APP_ID}&state=${state}`
+    a.button(href=installURL) Install
   table.communities
     thead
       tr

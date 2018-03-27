@@ -1,5 +1,6 @@
 'use strict';
 
+const crypto = require('crypto');
 const express = require('express');
 const logger = require('heroku-logger');
 
@@ -70,7 +71,10 @@ router.route('/communities')
         )
       )
     )
-    .then(communities => res.render('communities', {communities}))
+    .then(communities => {
+      const state = crypto.randomBytes(12).toString('hex');
+      res.render('communities', {communities, state});
+    })
     .catch(next),
   );
 

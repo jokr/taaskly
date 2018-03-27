@@ -83,9 +83,10 @@ router.route('/community_install')
           })
         )
       )
-      .then(commmunity => {
-        const redirect = req.query.redirect_uri || '/admin/communities';
-        res.redirect(redirect);
+      .then(community => {
+        const redirect = req.query.redirect_uri;
+        const state = req.query.state;
+        res.render('installSuccess', {community, state, redirect});
       })
       .catch(next);
   });

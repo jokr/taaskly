@@ -1,0 +1,19 @@
+extends layout
+
+block head
+  meta(http-equiv="refresh" content="3;url="+redirect)
+    
+block navigation
+
+block content
+  h1 Community Installed
+  p.
+    Taaskly has been successfuly installed on the community #[strong= community.name].
+  if state
+    p The following state param has been passed:
+    pre= state
+  else
+    p No state param has been passed.
+  p This site will redirect back to Workplace in 3 seconds:
+  pre= redirect
+    
