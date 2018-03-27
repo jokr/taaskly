@@ -7,6 +7,9 @@ block content
   .file-actions
     a#cpy Copy link
     a(href="/download/"+document.id+"/") Download
+    - const sharedURL = encodeURIComponent(`${process.env.BASE_URL}document/${document.id}`);
+    - const sharerURL = `https://work.facebook.com/dialog/share?app_id=${process.env.APP_ID}&display=popup&href=${sharedURL}`;
+    a#wp-share(target="popup" href=sharerURL) Share
   h2= document.name
   p.document= document.content
   p.meta Created by #{document.owner.username} #{moment(document.createdAt).fromNow()}
@@ -22,4 +25,19 @@ block content
       const previousHTML = e.trigger.innerHTML;
       e.trigger.innerHTML = 'Copied';
       setTimeout(() => e.trigger.innerHTML = previousHTML, 2000);
+    });
+  script.
+    const element = document.getElementById('wp-share');
+    element.addEventListener('click', () => {
+      const options = {
+        width: 600,
+        height: 600,
+        top: window.top.outerHeight / 2 - 600,
+        left: window.top.outerWidth / 2 - 600
+      };
+      const optionString = Object.entries(options)
+        .map(option => option.join('='))
+        .join(',');
+      window.open("#{sharerURL}", 'popup', optionString);
+      return false;
     });
