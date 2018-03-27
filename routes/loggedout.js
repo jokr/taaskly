@@ -83,7 +83,10 @@ router.route('/community_install')
           })
         )
       )
-      .then(commmunity => res.redirect('/admin/communities'))
+      .then(commmunity => {
+        const redirect = req.query.redirect_uri || '/admin/communities';
+        res.redirect(redirect);
+      })
       .catch(next);
   });
 
