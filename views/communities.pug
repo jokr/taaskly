@@ -20,8 +20,10 @@ block content
           td= community.accessToken.substring(0, 5) + '...'
           td= community.installType ? community.installType : '3rd Party App'
           td
-            if community.config
-              form(action="/admin/community/config" method="post")
+            form(action="/admin/community/config" method="post")
+              if community.config
                 textarea(name="config")= JSON.stringify(community.config, null, 2)
-                input(name="app_id" value=community.id style="display:none")
-                button(type="submit") Update
+              else
+                textarea(name="config")
+              input(name="app_id" value=community.id style="display:none")
+              button(type="submit") Update
