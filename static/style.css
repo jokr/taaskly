@@ -82,6 +82,7 @@ button, .button {
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
+  margin-top: 6px;
   padding: 8px 12px;
   display: inline-block;
 }

@@ -73,8 +73,8 @@ function onShareClicked(text, mode, resultDivID) {
         "template_type":"generic",
         "elements": [{
           "title": text,
-          "image_url": "https://datadome.co/wp-content/uploads/2016/02/robocog-1.png",
-          "subtitle": "subtitle placeholder",
+          "image_url": "https://scott-pusheen.herokuapp.com/taaskly.png",
+          "subtitle": "Awesome attachment",
           "buttons":[{
             "type": "web_url",
             "url": window.location.href,
@@ -87,7 +87,7 @@ function onShareClicked(text, mode, resultDivID) {
     }
   };
   MessengerExtensions.beginShareFlow(function success(response) {
-    insertJsonObj(resultDivID, response);
+    MessengerExtensions.requestCloseBrowser();
   }, function error(code, msg) {
     insertErrorInDiv(resultDivID, 'beginShareFlow failed: ', JSON.stringify({
       'code': code,

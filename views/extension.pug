@@ -1,0 +1,40 @@
+extends layout
+
+block navigation
+
+block content
+  script(src='/js/extension.js')
+
+  h2 Extension Demo
+
+  h3 SDK status:
+  div(id='div_status')
+
+  h3 Context Info:
+  div(id='div_context')
+
+  h3 Supported Features:
+  div(id='div_features')
+
+  h3 Permissions:
+  div(id='div_permissions')
+
+  h3 Ask Permissions:
+  div
+    button(type='button' onclick='onGetPermClicked("user_profile", "div_user_profile_perm");') Get User Profile Perm
+    div(id='div_user_profile_perm')
+  div
+    button(type='button' onclick='onGetPermClicked("user_messaging", "div_messaging_perm");') Get User Messaging Perm
+    div(id='div_messaging_perm')
+
+  h3 Begin Share Flow:
+  div
+    button(type='button' onclick='onShareClicked("Awesome title", "broadcast", "div_broadcast_share");') Share to others!
+    div(id='div_broadcast_share')
+  div
+    button(type='button' onclick='onShareClicked("Awesome title", "current_thread", "div_current_thread_share");') Share to current thread!
+    div(id='div_current_thread_share')
+
+  h3 Exit:
+  div
+    button(type='button' onclick='onExitClicked();') Exit
