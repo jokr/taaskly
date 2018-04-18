@@ -114,7 +114,7 @@ function handlePreview(change) {
                       ? 'red'
                       : task.priority === 'medium'
                       ? 'orange'
-                      : 'blue',
+                      : 'yellow',
                   },
                 );
               }
