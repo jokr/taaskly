@@ -214,3 +214,28 @@ p.document {
 .community-actions {
   margin-bottom: 4px;
 }
+
+.sharedposts {
+  padding-left: 0;
+}
+
+.sharedposts li {
+  align-items: center;
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.sharedposts li img {
+  margin-right: 8px;
+  width: 50px;
+  height: 50px;
+}
+
+.sharedposts-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.sharedposts-info p {
+  margin: 0;
+}

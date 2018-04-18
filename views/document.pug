@@ -14,7 +14,17 @@ block content
   p.document= document.content
   p.meta Created by #{document.owner.username} #{moment(document.createdAt).fromNow()}
   p.meta= document.privacy
-  pre= JSON.stringify(sharedposts, null, 2)
+  if sharedposts.sharedposts && sharedposts.sharedposts.data.length
+    h3 On Workplace
+    ul.sharedposts
+      each post in sharedposts.sharedposts.data
+        li
+          img(href=post.from.picture.data.url)
+          .sharedposts-info
+            p
+              a(href=post.permalink_url)= post.story
+            p.meta= moment(post.created_time).fromNow()
+  
   script.
     const clip = new ClipboardJS('#cpy', {
       text: function(trigger) {
