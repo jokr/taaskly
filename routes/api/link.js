@@ -56,16 +56,7 @@ function handlePreview(change) {
                 return {data: [], user};
               }
               return {
-                data: [{
-                  link: change.link,
-                  title: doc.name,
-                  description: doc.content.toString().substring(0, 200),
-                  privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-                  icon: `${process.env.BASE_URL}taaskly-icon.png`,
-                  canonical_link: `${process.env.BASE_URL}document/${doc.id}`,
-                  download_url: `${process.env.BASE_URL}download/${doc.id}/`,
-                  type: 'doc',
-                }],
+                data: [encodeDoc(doc)],
                 user,
               };
             });
@@ -77,55 +68,7 @@ function handlePreview(change) {
               if (task === null) {
                 return {data: [], user};
               }
-              const additionalData = [];
-              if (task.owner.workplaceID) {
-                additionalData.push(
-                  {
-                    title: 'Owner',
-                    format: 'user',
-                    value: task.owner.workplaceID,
-                  },
-                );
-              } else {
-                additionalData.push(
-                  {
-                    title: 'Owner',
-                    format: 'text',
-                    value: task.owner.username,
-                  },
-                );
-              }
-
-              additionalData.push(
-                {
-                  title: 'Created',
-                  format: 'datetime',
-                  value: task.createdAt,
-                },
-              );
-
-              if (task.priority !== null) {
-                additionalData.push(
-                  {
-                    title: 'Priority',
-                    format: 'text',
-                    value: task.priority,
-                    color: task.priority === 'high'
-                      ? 'red'
-                      : task.priority === 'medium'
-                      ? 'orange'
-                      : 'yellow',
-                  },
-                );
-              }
-              const data = {
-                link: change.link,
-                title: task.title,
-                privacy: 'organization',
-                type: 'task',
-                additional_data: additionalData,
-                icon: `${process.env.BASE_URL}taaskly-icon.png`,
-              };
+              const data = encodeTask(task);
               return {data: [data], user};
             });
           break;
@@ -144,28 +87,40 @@ function handleCollection(change) {
       }
       return db.models.user.findOne({where: {workplaceID: change.user.id}});
     })
-    .then(user => db.models.document
-      .findAll({where: {
-        [Op.or]: {
-          privacy: 'public',
-          ownerId: user ? user.id : null,
-        },
-      }})
-      .then(documents => {
-        const data = documents.map(doc => {
-          return {
-            link: `${process.env.BASE_URL}document/${doc.id}`,
-            title: doc.name,
-            description: doc.content.toString().substring(0, 200),
-            privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-            icon: `${process.env.BASE_URL}taaskly-icon.png`,
-            download_url: `${process.env.BASE_URL}download/${doc.id}/`,
-            type: 'doc',
-          };
-        });
-        return {data, user};
-      }),
-    );
+    .then(user => {
+      if (!change.link) {
+        return db.models.document
+          .findAll({
+            where: {
+              [Op.or]: {
+                privacy: 'public',
+                ownerId: user ? user.id : null,
+              },
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 5,
+          })
+          .then(documents => {
+            const data = documents.map(encodeDoc);
+            data.push({
+              link: `${process.env.BASE_URL}personalized-tasks`,
+              title: 'Tasks',
+              privacy: 'personalized',
+              type: 'folder',
+            });
+            return {data, user};
+          });
+      }
+      if (change.link.endsWith('personalized-tasks')) {
+        return db.models.task
+          .findAll({include: [{ model: db.models.user, as: 'owner' }]})
+          .then(tasks => {
+            const data = tasks.map(encodeTask);
+            return {data, user};
+          });
+      }
+      throw new BadRequest('Unknown link.');
+    });
 }
 
 router.route('/callback')
@@ -198,3 +153,67 @@ router.route('/callback')
   });
 
 module.exports = router;
+
+function encodeDoc(doc) {
+  return {
+    link: `${process.env.BASE_URL}document/${doc.id}`,
+    title: doc.name,
+    description: doc.content.toString().substring(0, 200),
+    privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+    icon: `${process.env.BASE_URL}taaskly-icon.png`,
+    download_url: `${process.env.BASE_URL}download/${doc.id}/`,
+    type: 'doc',
+  };
+}
+
+function encodeTask(task) {
+  const additionalData = [];
+  if (task.owner.workplaceID) {
+    additionalData.push(
+      {
+        title: 'Owner',
+        format: 'user',
+        value: task.owner.workplaceID,
+      },
+    );
+  } else {
+    additionalData.push(
+      {
+        title: 'Owner',
+        format: 'text',
+        value: task.owner.username,
+      },
+    );
+  }
+
+  additionalData.push(
+    {
+      title: 'Created',
+      format: 'datetime',
+      value: task.createdAt,
+    },
+  );
+
+  if (task.priority !== null) {
+    additionalData.push(
+      {
+        title: 'Priority',
+        format: 'text',
+        value: task.priority,
+        color: task.priority === 'high'
+          ? 'red'
+          : task.priority === 'medium'
+          ? 'orange'
+          : 'yellow',
+      },
+    );
+  }
+  return {
+    link: `${process.env.BASE_URL}/task/${task.id}`,
+    title: task.title,
+    privacy: 'organization',
+    type: 'task',
+    additional_data: additionalData,
+    icon: `${process.env.BASE_URL}taaskly-icon.png`,
+  }
+}
