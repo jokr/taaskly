@@ -19,7 +19,7 @@ block content
     ul.sharedposts
       each post in sharedposts.sharedposts.data
         li
-          img(href=post.from.picture.data.url)
+          img(src=post.from.picture.data.url)
           .sharedposts-info
             p
               a(href=post.permalink_url)= post.story
