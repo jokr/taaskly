@@ -88,13 +88,16 @@ function handleCollection(change) {
       return db.models.user.findOne({where: {workplaceID: change.user.id}});
     })
     .then(user => {
+      if (user === null) {
+        return {data: [], user};
+      }
       if (!change.link) {
         return db.models.document
           .findAll({
             where: {
               [Op.or]: {
                 privacy: 'public',
-                ownerId: user ? user.id : null,
+                ownerId: user.id,
               },
             },
             order: [['createdAt', 'DESC']],
