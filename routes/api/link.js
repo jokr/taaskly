@@ -9,6 +9,18 @@ const db = require('../../db');
 
 const router = express.Router();
 
+function extractId(link) {
+  const regexMatch = link.match(/\/(document|task|folder)\/([0-9]+)/);
+  if (regexMatch === null) {
+    logger.warn('Received unknown link', link);
+    throw new BadRequest('Unknown document link');
+  }
+  return {
+    id: parseInt(regexMatch[2]),
+    type: regexMatch[1],
+  };
+}
+
 function readChange(body) {
     if (body.entry.length !== 1) {
       logger.warn(`expected exactly one entry, got ${body.entry.length}`);
@@ -22,12 +34,7 @@ function readChange(body) {
 }
 
 function handlePreview(change) {
-  const regexMatch = change.link.match(/\/(document|task)\/([0-9]+)/);
-  if (regexMatch === null) {
-    logger.warn('Received unknown link', change.link);
-    throw new BadRequest('Unknown document link');
-  }
-
+  const {id, type} = extractId(change.link);
   return db.models.community.findById(parseInt(change.community.id))
     .then(community => {
       if (community === null) {
@@ -38,8 +45,7 @@ function handlePreview(change) {
     })
     .then(user => {
       logger.warn(user);
-      const id = parseInt(regexMatch[2]);
-      switch (regexMatch[1]) {
+      switch (type) {
         case 'document':
           return db.models.document
             .findOne({
@@ -61,6 +67,33 @@ function handlePreview(change) {
               };
             });
           break;
+        case 'folder':
+          return db.models.folder
+            .findOne({
+              where: {
+                id: id,
+                [Op.or]: {
+                  privacy: 'public',
+                  ownerId: user ? user.id : null,
+                },
+              },
+            })
+            .then(folder => {
+              if (folder === null) {
+                return {data: [], user};
+              }
+              return {
+                data: [{
+                  link: change.link,
+                  title: folder.name,
+                  privacy: folder.privacy === 'public' ? 'organization' : 'accessible',
+                  canonical_link: `${process.env.BASE_URL}document/${folder.id}`,
+                  type: 'folder',
+                }],
+                user,
+              };
+            });
+            break;
         case 'task':
           return db.models.task
             .findById(id, {include: [{ model: db.models.user, as: 'owner' }]})
@@ -91,38 +124,56 @@ function handleCollection(change) {
       if (user === null) {
         return {data: [], user};
       }
-      if (!change.link) {
+      const filter = {
+        order: [['createdAt', 'DESC']],
+        where: {
+          [Op.or]: {
+            privacy: 'public',
+            ownerId: user ? user.id : null,
+          },
+        },
+        limit: 5,
+      };
+      if (change.link) {
+        if (change.link.endsWith('personalized-tasks')) {
+          return db.models.task
+            .findAll({include: [{ model: db.models.user, as: 'owner' }]})
+            .then(tasks => {
+              const data = tasks.map(encodeTask);
+              return {data, user};
+            });
+        }
+
+        const {id, type} = extractId(change.link);
+        filter.where['folderId'] = id;
         return db.models.document
-          .findAll({
-            where: {
-              [Op.or]: {
-                privacy: 'public',
-                ownerId: user.id,
-              },
-            },
-            order: [['createdAt', 'DESC']],
-            limit: 5,
-          })
+          .findAll(filter)
           .then(documents => {
             const data = documents.map(encodeDoc);
-            data.push({
+            return {data, user};
+          });
+      }
+      return Promise.all([
+          db.models.document.findAll(filter),
+          db.models.folder.findAll(filter),
+        ])
+        .then(results => {
+          const [documents, folders] = results;
+          const personalizedFolders = [
+            {
               link: `${process.env.BASE_URL}personalized-tasks`,
               title: 'Tasks',
               privacy: 'personalized',
               type: 'folder',
-            });
-            return {data, user};
-          });
-      }
-      if (change.link.endsWith('personalized-tasks')) {
-        return db.models.task
-          .findAll({include: [{ model: db.models.user, as: 'owner' }]})
-          .then(tasks => {
-            const data = tasks.map(encodeTask);
-            return {data, user};
-          });
-      }
-      throw new BadRequest('Unknown link.');
+            },
+          ];
+          const folderData = folders.map(encodeFolder);
+          const documentData = documents.map(encodeDoc);
+          return {
+            data: personalizedFolders.concat(folderData, documentData),
+            user: user,
+          };
+        });
     });
 }
 
@@ -157,9 +208,9 @@ router.route('/callback')
 
 module.exports = router;
 
-function encodeDoc(doc) {
+function encodeDoc(doc, link) {
   return {
-    link: `${process.env.BASE_URL}document/${doc.id}`,
+    link: link ? link : `${process.env.BASE_URL}document/${doc.id}`,
     title: doc.name,
     description: doc.content.toString().substring(0, 200),
     privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
@@ -169,7 +220,17 @@ function encodeDoc(doc) {
   };
 }
 
-function encodeTask(task) {
+function encodeFolder(folder, link) {
+  return {
+    link: link ? link : `${process.env.BASE_URL}folder/${folder.id}`,
+    title: folder.name,
+    privacy: folder.privacy === 'public' ? 'organization' : 'accessible',
+    canonical_link: `${process.env.BASE_URL}document/${folder.id}`,
+    type: 'folder',
+  };
+}
+
+function encodeTask(task, link) {
   const additionalData = [];
   if (task.owner.workplaceID) {
     additionalData.push(
@@ -212,7 +273,7 @@ function encodeTask(task) {
     );
   }
   return {
-    link: `${process.env.BASE_URL}/task/${task.id}`,
+    link: link ? link : `${process.env.BASE_URL}/task/${task.id}`,
     title: task.title,
     privacy: 'organization',
     type: 'task',

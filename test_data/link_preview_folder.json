@@ -1,0 +1,23 @@
+{
+  "object": "link",
+  "entry": [
+    {
+      "id": "1620872521322118",
+      "time": 1524519813,
+      "changes": [
+        {
+          "value": {
+            "community": {
+              "id": "914584838617560"
+            },
+            "user": {
+              "id": "319922278498384"
+            },
+            "link": "https://www.taaskly.com/folder/1"
+          },
+          "field": "collection"
+        }
+      ]
+    }
+  ]
+}
