@@ -1,12 +1,10 @@
 extends layout
 
 block content
-  h2 Create a New Document
-  form(action="/document/create" method="post")
+  h2 Create a New Folder
+  form(action="/folder/create" method="post")
     label.label Name
       input(type="text" name="name" required)
-    label.label Content
-      textarea(name="content")
     p.label Privacy
     .input-group
       input(id="privacy-public" type="radio" name="privacy" value="public" checked)
@@ -14,10 +12,5 @@ block content
     .input-group
       input(id="privacy-restricted" type="radio" name="privacy" value="restricted")
       label(for="privacy-restricted") Restricted
-    p.label Folder
-    select(name="folder").dropdown
-      option(value="") None
-      each folder in folders
-        option(value=folder.id, selected= folder.id == folder.id)= folder.name
     p
       button(type="submit") Create

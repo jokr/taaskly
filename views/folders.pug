@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h2 All Folder
+  p
+    a(href="/folder/create") New Folder
+  table.users
+    thead
+      tr
+        th ID
+        th Name
+        th Owner
+        th Privacy
+    tbody.link-table
+      each folder in folders
+        tr
+          td(style="width: 50px")
+            a(href="/folder/" + folder.id)= folder.id
+          td
+            a(href="/folder/" + folder.id)= folder.name
+          td(style="width: 200px")
+            a(href="/folder" + folder.id)= folder.owner.username
+          td(style="width: 100px")
+            a(href="/folder/" + folder.id)= folder.privacy

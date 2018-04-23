@@ -18,6 +18,10 @@ router.route('/logout')
 router.route('/documents')
   .get((req, res, next) => db.models.document
     .findAll({
+      include: [
+        {model: db.models.user, as: 'owner'},
+        {model: db.models.folder, as: 'folder'},
+      ],
       where: {
         [Op.or]: [{ownerId: req.user.id}, {privacy: 'public'}],
       },
@@ -28,14 +32,18 @@ router.route('/documents')
   );
 
 router.route('/document/create')
-  .get((req, res, next) => res.render('createDocument'))
+  .get((req, res, next) =>
+    db.models.folder
+      .findAll()
+      .then(folders => res.render('createDocument', {folders, selected: req.query.folder}))
+  )
   .post((req, res, next) => db.models.document
     .create({
       name: req.body.name,
       content: req.body.content,
       privacy: req.body.privacy,
       ownerId: req.user.id,
-      icon: req.body.unicorn ? 'unicorn.png' : null,
+      folderId: req.body.folder ? req.body.folder : null,
     })
     .then(() => res.redirect('/documents'))
     .catch(next),
@@ -80,6 +88,55 @@ router.route('/document/:id')
     }
     return res.render('document', {document, sharedposts});
   }));
+
+router.route('/folders')
+  .get((req, res, next) => db.models.folder
+    .findAll({ include: [{model: db.models.user, as: 'owner'}]})
+    .then(folders => res.render('folders', {folders}))
+    .catch(next),
+  );
+
+router.route('/folder/create')
+  .get((req, res, next) => res.render('createFolder'))
+  .post((req, res, next) => db.models.folder
+    .create({
+      name: req.body.name,
+      privacy: req.body.privacy,
+      ownerId: req.user.id,
+    })
+    .then(() => res.redirect('/folders'))
+    .catch(next));
+
+router.route('/folder/:id')
+  .get((req, res, next) => db.models.folder.findById(
+    req.params.id, {
+      include: [
+        {model: db.models.user, as: 'owner'},
+        {model: db.models.document, as: 'documents'},
+      ],
+      where: {
+        [Op.or]: {
+          privacy: 'public',
+          ownerId: req.user.id,
+        },
+      },
+    })
+    .then(folder => {
+      if (!folder) {
+        return res
+          .status(404)
+          .render(
+            'error',
+            {
+              header: 'Folder does not exist',
+              message: 'The folder you requested does not seem to exist.',
+            },
+          );
+      }
+      return res.render('folder', {folder});
+    })
+    .catch(next)
+  );
 
 router.route('/tasks')
   .get((req, res, next) => db.models.task

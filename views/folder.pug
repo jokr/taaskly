@@ -1,24 +1,22 @@
 extends layout
 
 block content
-  h2 All Documents
+  h2= folder.name
   p
-    a(href="/document/create") New Document
+    a(href=`/document/create?folder=${folder.id}`) New Document
   table.users
     thead
       tr
         th ID
         th Name
         th Content
-        th Folder
-        th Owner
         th Privacy
     tbody.link-table
-      each document in documents
+      each document in folder.documents
         tr
           td(style="width: 50px")
             a(href="/document/" + document.id)= document.id
-          td(style="width: 300px")
+          td
             a(href="/document/" + document.id)= document.name
           td
             a(href="/document/" + document.id)
@@ -27,9 +25,5 @@ block content
                 = content.substring(0, 100) + ' ...'
               else
                 = content
-          td(style="width: 200px")
-            a(href="/document/" + document.id)= document.folder ? document.folder.name : null
-          td(style="width: 200px")
-            a(href="/document/" + document.id)= document.owner.username
           td(style="width: 100px")
             a(href="/document/" + document.id)= document.privacy

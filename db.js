@@ -67,6 +67,21 @@ const Task = sequelize.define('task', {
   },
 });
 
+const Folder = sequelize.define('folder', {
+  name: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+  },
+  privacy: {
+    type: Sequelize.ENUM('public', 'restricted'),
+    defaultValue: 'public',
+    allowNull: false,
+  },
+});
+
 const Document = sequelize.define('document', {
   name: {
     type: Sequelize.STRING,
@@ -125,7 +140,10 @@ const Callback = sequelize.define('callback', {
   },
 );
 
+Folder.belongsTo(User, { as: 'owner', foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
+Folder.hasMany(Document, { as: 'documents', onDelete: 'CASCADE' });
 Document.belongsTo(User, { as: 'owner',  foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
+Document.belongsTo(Folder, { as: 'folder', foreignKey: {allowNull: true }, onDelete: 'CASCADE' });
 Task.belongsTo(User, { as: 'owner', foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
 User.belongsTo(Community, { as: 'community', foreignKey: { allowNull: true }, onDelete: 'SET NULL'});
 
@@ -135,6 +153,7 @@ let sync = process.env.SYNC_TABLES && process.env.SYNC_TABLES.toLowerCase() === 
 if (sync || force) {
   Promise.all([Community.sync({force}), Callback.sync({force})])
     .then(() => User.sync({force}))
+    .then(() => Folder.sync({force}))
     .then(() => Promise.all([Document.sync({force}), Task.sync({force})]))
     .then(() => logger.info('Table sync complete.'))
     .catch(err => logger.error(err));
