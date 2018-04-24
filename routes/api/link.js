@@ -62,7 +62,7 @@ function handlePreview(change) {
                 return {data: [], user};
               }
               return {
-                data: [encodeDoc(doc)],
+                data: [encodeDoc(change.link)(doc)],
                 user,
               };
             });
@@ -83,13 +83,7 @@ function handlePreview(change) {
                 return {data: [], user};
               }
               return {
-                data: [{
-                  link: change.link,
-                  title: folder.name,
-                  privacy: folder.privacy === 'public' ? 'organization' : 'accessible',
-                  canonical_link: `${process.env.BASE_URL}document/${folder.id}`,
-                  type: 'folder',
-                }],
+                data: [encodeFolder(change.link)(folder)],
                 user,
               };
             });
@@ -101,7 +95,7 @@ function handlePreview(change) {
               if (task === null) {
                 return {data: [], user};
               }
-              const data = encodeTask(task);
+              const data = encodeTask(change.link)(task);
               return {data: [data], user};
             });
           break;
@@ -139,7 +133,7 @@ function handleCollection(change) {
           return db.models.task
             .findAll({include: [{ model: db.models.user, as: 'owner' }]})
             .then(tasks => {
-              const data = tasks.map(encodeTask);
+              const data = tasks.map(encodeTask());
               return {data, user};
             });
         }
@@ -149,7 +143,7 @@ function handleCollection(change) {
         return db.models.document
           .findAll(filter)
           .then(documents => {
-            const data = documents.map(encodeDoc);
+            const data = documents.map(encodeDoc());
             return {data, user};
           });
       }
@@ -167,8 +161,8 @@ function handleCollection(change) {
               type: 'folder',
             },
           ];
-          const folderData = folders.map(encodeFolder);
-          const documentData = documents.map(encodeDoc);
+          const folderData = folders.map(encodeFolder());
+          const documentData = documents.map(encodeDoc());
           return {
             data: personalizedFolders.concat(folderData, documentData),
             user: user,
@@ -208,76 +202,84 @@ router.route('/callback')
 
 module.exports = router;
 
-function encodeDoc(doc, link) {
-  return {
-    link: link ? link : `${process.env.BASE_URL}document/${doc.id}`,
-    title: doc.name,
-    description: doc.content.toString().substring(0, 200),
-    privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-    icon: `${process.env.BASE_URL}taaskly-icon.png`,
-    download_url: `${process.env.BASE_URL}download/${doc.id}/`,
-    type: 'doc',
+function encodeDoc(link) {
+  return function(doc) {
+    return {
+      link: link ? link : `${process.env.BASE_URL}document/${doc.id}`,
+      title: doc.name,
+      description: doc.content.toString().substring(0, 200),
+      privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
+      icon: `${process.env.BASE_URL}taaskly-icon.png`,
+      download_url: `${process.env.BASE_URL}download/${doc.id}/`,
+      canonical_link: `${process.env.BASE_URL}document/${doc.id}`,
+      type: 'doc',
+    };
   };
 }
 
-function encodeFolder(folder, link) {
-  return {
-    link: link ? link : `${process.env.BASE_URL}folder/${folder.id}`,
-    title: folder.name,
-    privacy: folder.privacy === 'public' ? 'organization' : 'accessible',
-    canonical_link: `${process.env.BASE_URL}document/${folder.id}`,
-    type: 'folder',
+function encodeFolder(link) {
+  return function(folder) {
+    return {
+      link: link ? link : `${process.env.BASE_URL}folder/${folder.id}`,
+      title: folder.name,
+      privacy: folder.privacy === 'public' ? 'organization' : 'accessible',
+      canonical_link: `${process.env.BASE_URL}folder/${folder.id}`,
+      type: 'folder',
+    };
   };
 }
 
-function encodeTask(task, link) {
-  const additionalData = [];
-  if (task.owner.workplaceID) {
-    additionalData.push(
-      {
-        title: 'Owner',
-        format: 'user',
-        value: task.owner.workplaceID,
-      },
-    );
-  } else {
-    additionalData.push(
-      {
-        title: 'Owner',
-        format: 'text',
-        value: task.owner.username,
-      },
-    );
-  }
+function encodeTask(link) {
+  return function(task) {
+    const additionalData = [];
+    if (task.owner.workplaceID) {
+      additionalData.push(
+        {
+          title: 'Owner',
+          format: 'user',
+          value: task.owner.workplaceID,
+        },
+      );
+    } else {
+      additionalData.push(
+        {
+          title: 'Owner',
+          format: 'text',
+          value: task.owner.username,
+        },
+      );
+    }
 
-  additionalData.push(
-    {
-      title: 'Created',
-      format: 'datetime',
-      value: task.createdAt,
-    },
-  );
-
-  if (task.priority !== null) {
     additionalData.push(
       {
-        title: 'Priority',
-        format: 'text',
-        value: task.priority,
-        color: task.priority === 'high'
-          ? 'red'
-          : task.priority === 'medium'
-          ? 'orange'
-          : 'yellow',
+        title: 'Created',
+        format: 'datetime',
+        value: task.createdAt,
       },
     );
-  }
-  return {
-    link: link ? link : `${process.env.BASE_URL}/task/${task.id}`,
-    title: task.title,
-    privacy: 'organization',
-    type: 'task',
-    additional_data: additionalData,
-    icon: `${process.env.BASE_URL}taaskly-icon.png`,
-  }
+
+    if (task.priority !== null) {
+      additionalData.push(
+        {
+          title: 'Priority',
+          format: 'text',
+          value: task.priority,
+          color: task.priority === 'high'
+            ? 'red'
+            : task.priority === 'medium'
+            ? 'orange'
+            : 'yellow',
+        },
+      );
+    }
+    return {
+      link: link ? link : `${process.env.BASE_URL}/task/${task.id}`,
+      title: task.title,
+      privacy: 'organization',
+      type: 'task',
+      additional_data: additionalData,
+      icon: `${process.env.BASE_URL}taaskly-icon.png`,
+      canonical_link: `${process.env.BASE_URL}task/${task.id}`,
+    };
+  };
 }
