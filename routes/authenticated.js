@@ -74,7 +74,7 @@ router.route('/document/:id')
   ])
   .catch(next)
   .then(result => {
-    const [document, sharedposts] = result;
+    const [document, graphResponse] = result;
     if (!document) {
       return res
         .status(404)
@@ -86,7 +86,7 @@ router.route('/document/:id')
           },
         );
     }
-    return res.render('document', {document, sharedposts});
+    return res.render('document', {document, sharedposts: graphResponse ? graphResponse.sharedposts : null});
   }));
 
 router.route('/folders')

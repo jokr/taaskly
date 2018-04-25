@@ -14,10 +14,10 @@ block content
   p.document= document.content
   p.meta Created by #{document.owner.username} #{moment(document.createdAt).fromNow()}
   p.meta= document.privacy
-  if sharedposts.sharedposts && sharedposts.sharedposts.data.length
+  if sharedposts && sharedposts.data.length
     h3 On Workplace
     ul.sharedposts
-      each post in sharedposts.sharedposts.data
+      each post in sharedposts.data
         li
           img(src=post.from.picture.data.url)
           .sharedposts-info
