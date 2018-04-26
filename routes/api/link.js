@@ -89,15 +89,19 @@ function handlePreview(change) {
             });
             break;
         case 'task':
-          return db.models.task
-            .findById(id, {include: [{ model: db.models.user, as: 'owner' }]})
-            .then(task => {
-              if (task === null) {
-                return {data: [], user};
-              }
-              const data = encodeTask(change.link)(task);
-              return {data: [data], user};
-            });
+          if (user) {
+            return db.models.task
+              .findById(id, {include: [{ model: db.models.user, as: 'owner' }]})
+              .then(task => {
+                if (task === null) {
+                  return {data: [], user};
+                }
+                const data = encodeTask(change.link)(task);
+                return {data: [data], user};
+              });
+          } else {
+            return {data: [], user};
+          }
           break;
         default:
           throw new BadRequest('Invalid url.');
