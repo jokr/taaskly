@@ -1,8 +1,9 @@
 'use static';
 
-const db = require('./db');
-const messageSender = require('./messages');
 const url = require('url');
+
+const db = require.main.require('./db');
+const messageSender = require('./messages');
 
 exports.handleSingleMessageEvent = function(req, messagingEvent) {
   const senderID = messagingEvent.thread ? messagingEvent.thread.id : messagingEvent.sender.id;

@@ -2,9 +2,10 @@
 
 const express = require('express');
 
+const message_handler = require.main.require('./message/message_handler');
+const messages = require.main.require('./message/messages');
+
 const BadRequest = require('./BadRequest');
-const message_handler = require('../../message_handler');
-const messages = require('../../messages');
 
 const router = express.Router();
 

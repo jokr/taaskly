@@ -27,16 +27,11 @@ router.route('/')
   );
 
 router.route('/subscribe')
-  .post((req, res, next) => graph('app/subscriptions')
-    .post()
-    .appSecret()
-    .qs({
-      object: 'link',
-      callback_url: process.env.LINK_WEBHOOK_CALLBACK,
-      verify_token: process.env.VERIFY_TOKEN,
-      fields: ['preview','collection'],
-    })
-    .send()
+  .post((req, res, next) =>
+    Promise.all([
+      webhookSubscribe('link', ['preview', 'collection']),
+      webhookSubscribe('page', ['message']),
+    ])
     .then(() => res.redirect('/admin'))
     .catch(next),
   );
@@ -141,5 +136,18 @@ router.route('/user/:id/delete')
     .then(() => res.redirect('/admin/users'))
     .catch(next),
   );
+
+function webhookSubscribe(topic, fields) {
+  return graph('app/subscriptions')
+    .post()
+    .appSecret()
+    .qs({
+      object: 'link',
+      callback_url: `https://www.taaskly.com/api/${topic}/callback`,
+      verify_token: process.env.VERIFY_TOKEN,
+      fields: fields,
+    })
+    .send()
+}
 
 module.exports = router;

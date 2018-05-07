@@ -3,9 +3,10 @@
 const express = require('express');
 const logger = require('heroku-logger');
 const Op = require('sequelize').Op;
-const db = require('../db');
-const graph = require('../graph');
-const messages = require('../messages');
+
+const db = require.main.require('./db');
+const graph = require.main.require('./graph');
+const messages = require.main.require('./message/messages');
 
 const router = express.Router();
 

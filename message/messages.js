@@ -1,7 +1,7 @@
 'use strict';
 
-const graph = require('./graph');
-const db = require('./db');
+const graph = require.main.require('./graph');
+const db = require.main.require('./db');
 
 function defaultToken(token) {
   if (token !== null) {
