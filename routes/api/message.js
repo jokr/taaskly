@@ -24,13 +24,13 @@ function readMessaging(body) {
 router.route('/callback')
   .post(
     (req, res, next) => {
-      // console.log(JSON.stringify(req.body));
-      // const data = req.body;
-      // data.entry.forEach(function(singleEntry) {
-      //   singleEntry.messaging.forEach(function(messagingEvent) {
-      //     message_handler.handleSingleMessageEvent(req, messagingEvent);
-      //   });
-      // });
+      console.log(JSON.stringify(req.header));
+      const data = req.body;
+      data.entry.forEach(function(singleEntry) {
+        singleEntry.messaging.forEach(function(messagingEvent) {
+          message_handler.handleSingleMessageEvent(req, messagingEvent);
+        });
+      });
 
       return res.status(200).send("OK");
     });
