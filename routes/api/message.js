@@ -24,7 +24,9 @@ function readMessaging(body) {
 router.route('/callback')
   .post(
     (req, res, next) => {
-      console.log(JSON.stringify(req.header));
+      console.log('----- req ------');
+      console.log(JSON.stringify(req.headers));
+      console.log('----- req ------');
       const data = req.body;
       data.entry.forEach(function(singleEntry) {
         singleEntry.messaging.forEach(function(messagingEvent) {
