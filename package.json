@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "A sample app for Workplace demonstrating account linking, link previewing and composer integration.",
   "engines": {
-    "node": "8.1.x"
+    "node": "8.x.x"
   },
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,6 @@
     "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
-    "express-basic-auth": "^1.1.4",
     "express-session": "^1.15.6",
     "heroku-logger": "^0.3.0",
     "html-pdf": "^2.2.0",

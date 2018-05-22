@@ -30,7 +30,6 @@ router.route('/subscribe')
   .post((req, res, next) =>
     Promise.all([
       webhookSubscribe('link', ['preview', 'collection']),
-      webhookSubscribe('page', ['message']),
     ])
     .then(() => res.redirect('/admin'))
     .catch(next),
@@ -50,56 +49,10 @@ router.route('/communities')
       }
       return communities;
     })
-    .then(communities => Promise.all(
-      communities.map(
-        community =>
-        graph('me/messenger_profile?fields=whitelisted_domains,home_url,account_linking_url,persistent_menu,get_started,greeting')
-          .token(community.accessToken)
-          .send()
-          .then(result => {
-            community['config'] = result.data[0] || '';
-            return community;
-          })
-          .catch(() => {
-            return community;
-          })
-        )
-      )
-    )
     .then(communities => {
       const state = crypto.randomBytes(12).toString('hex');
       res.render('communities', {communities, state});
     })
-    .catch(next),
-  );
-
-router.route('/community/config')
-  .post((req, res, next) => db.models.community
-    .findOne({where: {id: req.body.app_id}})
-    .then(community => {
-      if (community) {
-        return community.accessToken;
-      }
-      if (process.env.APP_ID === req.body.app_id) {
-        return process.env.ACCESS_TOKEN;
-      }
-      throw new BadRequest('Unknown app id.');
-    })
-    .then(accessToken => {
-      const graphRequest = graph('me/messenger_profile')
-        .token(accessToken);
-      if (req.body.config) {
-        return graphRequest.body(JSON.parse(req.body.config)).post().send();
-      } else {
-        return graphRequest.body({
-          fields: [
-            'whitelisted_domains',
-            'home_url'
-          ]
-        }).delete().send();
-      }
-    })
-    .then(() => res.redirect('/admin/communities'))
     .catch(next),
   );
 

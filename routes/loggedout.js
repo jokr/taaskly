@@ -32,7 +32,7 @@ router.route('/login')
 router.route('/register')
   .get((req, res, next) => res.render('register'))
   .post((req, res, next) => {
-    const hash = bcrypt.hash(req.body.password, parseInt(process.env.SALT_ROUNDS))
+    const hash = bcrypt.hash(req.body.password, 10)
       .then(hash => db.models.user.create({username: req.body.username, passwordHash: hash}))
       .then(user => {
         req.login(user, err => {

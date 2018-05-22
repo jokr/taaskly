@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const logger = require('heroku-logger')
 const request = require('request-promise');
 
-const baseURL = process.env.GRAPH_API_URL || 'https://graph.facebook.com';
+const baseURL = 'https://graph.facebook.com';
 
 class GraphRequest {
   constructor(path) {
@@ -46,7 +46,7 @@ class GraphRequest {
   send() {
     let options = {
       method: this.method || 'GET',
-      uri: `${baseURL}/v2.11/${this.path}`,
+      uri: `${baseURL}/v3.0/${this.path}`,
       qs: Object.assign(this._calcProof(), this.queryString || {}),
       json: true,
       resolveWithFullResponse: true,

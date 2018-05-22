@@ -26,8 +26,7 @@ We also need a couple of other configuration variables:
 ```
 SESSION_SECRET=SOME_RANDOM_BYTES
 DATABASE_URL=DB_CONNECTION_STRING
-WEBHOOK_CALLBACK=CALLBACK_URL
-SALT_ROUNDS=SALT_ROUNDS_FOR_BCRYPT
+BASE_URL=URL_WHERE_THIS_APP_IS_RUNNING
 ```
 
 Then start the application.
@@ -50,8 +49,7 @@ $ heroku config:set APP_SECRET=YOUR_APP_SECRET
 $ heroku config:set APP_REDIRECT=YOUR_APP_REDIRECT
 $ heroku config:set SESSION_SECRET=SOME_RANDOM_BYTES
 $ heroku config:set DATABASE_URL=DB_CONNECTION_STRING
-$ heroku config:set WEBHOOK_CALLBACK=CALLBACK_URL
-$ heroku config:set SALT_ROUNDS=SALT_ROUNDS_FOR_BCRYPT
+$ heroku config:set BASE_URL=BASE_URL
 $ git push heroku master
 $ heroku open
 ```
@@ -62,5 +60,4 @@ or
 ## Documentation
 
 - [Graph API Overview](https://developers.facebook.com/docs/graph-api/overview)
-- [Manual Login Flows](https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow)
 - [Workplace Docs](https://developers.facebook.com/docs/workplace)

@@ -66,9 +66,6 @@ function logAndValidateCallback(req, res, next) {
 
 router.use(bodyParser.json({ verify: xhub }));
 
-router.route('/extension')
-  .get((req, res, next) => res.render('extension'));
-
 router.route('/community_uninstall')
   .post((req, res, next) => {
     db.models.callback
@@ -118,7 +115,6 @@ router.get('*', (req, res, next) => {
 });
 router.post('*', logAndValidateCallback);
 router.use('/link', require('./link'));
-router.use('/page', require('./page'));
 router.use('*', (req, res, next) => res.status(404).send());
 router.use(errorHandler);
 

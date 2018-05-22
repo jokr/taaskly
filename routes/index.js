@@ -1,6 +1,5 @@
 'use strict';
 
-const basicAuth = require('express-basic-auth');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const logger = require('heroku-logger');
@@ -50,19 +49,12 @@ router.use((req, res, next) => {
     navigation.push({name: 'Documents', path: '/documents'});
     navigation.push({name: 'Folders', path: '/folders'});
     navigation.push({name: 'Tasks', path: '/tasks'});
-    navigation.push({name: 'Messages', path: '/messages'});
     if (req.isAdmin) {
       navigation.push({name: 'Admin', path: '/admin'});
     }
   }
   res.locals.navigation = navigation;
   next();
-});
-
-const auth = basicAuth({
-  authorizer: (username, password) => password === process.env.MASTER_PASSWORD,
-  challenge: true,
-  realm: 'taaskly',
 });
 
 router.route('/download/:id')
@@ -103,7 +95,6 @@ router.route('/download/:id')
   );
 
 router.use('/api', api);
-router.use(auth);
 router.use(loggedout);
 router.use(loginRedirect);
 router.use(authenticated);

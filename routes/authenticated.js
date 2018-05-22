@@ -6,7 +6,6 @@ const Op = require('sequelize').Op;
 
 const db = require.main.require('./db');
 const graph = require.main.require('./graph');
-const messages = require.main.require('./message/messages');
 
 const router = express.Router();
 
@@ -162,15 +161,6 @@ router.route('/task/:id')
   .get((req, res, next) => db.models.task
     .findById(req.params.id, {include: [{ model: db.models.user, as: 'owner' }]})
     .then(task => res.render('task', {task})),
-  );
-
-router.route('/messages')
-  .get((req, res, next) => res.render('messages'))
-  .post((req, res, next) => {
-      messages.postTextMessage(req.body.target, req.body.message, null)
-      .then(() => res.redirect('/messages'))
-      .catch(next);
-    },
   );
 
 router.route('/link_account_confirm')
