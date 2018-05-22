@@ -2,6 +2,8 @@
 
 A Workplace application demonstrating account linking, file preview and composer integration. This models a simple document store with very simple privacy rules.
 
+![image](https://user-images.githubusercontent.com/231923/40370723-c926c2e6-5dd8-11e8-9b0a-d35ab490240d.png)
+
 ## Running Locally
 
 Make sure you have [Node.js](http://nodejs.org/) installed.
