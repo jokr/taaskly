@@ -30,6 +30,7 @@ router.route('/subscribe')
   .post((req, res, next) =>
     Promise.all([
       webhookSubscribe('link', ['preview', 'collection']),
+      webhookSubscribe('page', ['mention']),
     ])
     .then(() => res.redirect('/admin'))
     .catch(next),
@@ -95,7 +96,7 @@ function webhookSubscribe(topic, fields) {
     .post()
     .appSecret()
     .qs({
-      object: 'link',
+      object: topic,
       callback_url: `https://www.taaskly.com/api/${topic}/callback`,
       verify_token: process.env.VERIFY_TOKEN,
       fields: fields,
