@@ -12,26 +12,25 @@
             "message_tags": [
               {
                 "length": 7,
-                "offset": 9,
+                "offset": 18,
                 "type": "page",
                 "id": "2035268540053170",
                 "name": "Taaskly"
               }
             ],
-            "comment_id": "182488835798063_182490959131184",
             "community": {
               "id": "2037473269825570"
             },
-            "post_id": "179193059460974_182488835798063",
+            "post_id": "179193059460974_182488732464740",
             "verb": "add",
-            "item": "comment",
-            "created_time": 1528196948,
-            "message": "Now what Taaskly"
+            "item": "post",
+            "created_time": 1528196150,
+            "message": "Top level mention Taaskly"
           }
         }
       ],
       "id": "2035268540053170",
-      "time": 1528197018
+      "time": 1528196154
     }
   ],
   "object": "page"

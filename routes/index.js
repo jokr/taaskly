@@ -32,6 +32,9 @@ function forceAdmin(req, res, next) {
 
 function errorHandler(err, req, res, next) {
   logger.error(err);
+  if (res.headersSent) {
+    return;
+  }
   res.status(500).render('error', {message: err.message, details: err.stack});
 }
 

@@ -16,6 +16,10 @@ const validate = process.env.NODE_ENV === 'true';
 function errorHandler(err, req, res, next) {
   logger.error(err);
 
+  if (res.headersSent) {
+    return;
+  }
+
   if (err instanceof BadRequest) {
     res.status(400).json({message: err.message, details: err.stack});
   } else {
