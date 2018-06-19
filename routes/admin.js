@@ -45,11 +45,22 @@ router.route('/communities')
           id: process.env.APP_ID,
           name: 'Custom Integration',
           accessToken: process.env.ACCESS_TOKEN,
-          installType: 'Custom Integration'
         }].concat(communities);
       }
       return communities;
     })
+    .then(communities => Promise.all(
+      communities.map(community =>
+        graph('community')
+          .qs({fields: 'id,install'})
+          .token(community.accessToken)
+          .send()
+          .then(response => {
+            community.permissions = response.install.permissions;
+            community.installType = response.install.install_type;
+            return community;
+          }),
+    )))
     .then(communities => {
       const state = crypto.randomBytes(12).toString('hex');
       res.render('communities', {communities, state});

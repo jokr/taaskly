@@ -11,13 +11,13 @@ block content
         th(style="width: 200px") Workplace ID
         th Name
         th Created Time
-        th Access Token
         th Install Type
+        th Permissions
     tbody
       each community in communities
         tr
           td= community.id
           td= community.name
           td= moment(community.createdAt).fromNow()
-          td= community.accessToken.substring(0, 5) + '...'
-          td= community.installType ? community.installType : '3rd Party App'
+          td= community.installType.toLowerCase()
+          td= community.permissions.join(', ').toLowerCase()

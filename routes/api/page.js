@@ -26,10 +26,7 @@ router.route('/callback')
       .map(handleMention);
     Promise
       .all(mentionHandles)
-      .then(results => {
-        console.log(results);
-        logger.info('Posted back.')
-      });
+      .then();
   });
 
 function handleMention(value) {
