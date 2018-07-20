@@ -37,37 +37,55 @@ function handleMention(value) {
         throw new BadRequest(`Could not find community for mention webhook: ${communityId}`);
       }
 
-      if (value.item === 'comment') {
-        return graph(value.comment_id)
-          .token(community.accessToken)
-          .qs({fields: 'parent{id}'})
-          .send()
-          .then(response => {
-            if (response.parent) {
-              return replyRequest(response.parent.id)
-                .token(community.accessToken)
-                .send();
-            } else {
-              return replyRequest(value.comment_id)
-                .token(community.accessToken)
-                .send();
-            }
-          });
-      }
-
-      return replyRequest(value.post_id)
-        .token(community.accessToken)
-        .send();
+      db.models.user.findOne({where: {workplaceID: value.from.id}})
+        .then(user => {
+          if (!user) {
+            return reply(community, value, 'Whoops, I do not know who to assign this task to.');
+          }
+          const message = value.message.replace('Taaskly', '').trim();
+          return db.models.task
+            .create({
+              title: value.message.replace('Taaskly', '').trim(),
+              ownerId: user.id,
+            })
+            .then(task => {
+              return reply(community, value, `Created a task: ${process.env.BASE_URL}task/${task.id}`);
+            });
+        })
     })
     .catch(err => {
       logger.error(err.message);
     })
 }
 
-function replyRequest(target) {
-  return graph(`${target}/comments`)
+function reply(community, value, message) {
+  if (value.item === 'comment') {
+    return graph(value.comment_id)
+      .token(community.accessToken)
+      .qs({fields: 'parent{id}'})
+      .send()
+      .then(response => {
+        if (response.parent) {
+          return graph(`${response.parent.id}/comments`)
+            .token(community.accessToken)
+            .body({message: message})
+            .post()
+            .send();
+        } else {
+          return graph(`${value.comment_id}/comments`)
+            .token(community.accessToken)
+            .body({message: message})
+            .post()
+            .send();
+        }
+      });
+  }
+
+  return graph(`${value.post_id}/comments`)
+    .token(community.accessToken)
+    .body({message: message})
     .post()
-    .body({message: 'Yo, this is Taaskly'});
+    .send();
 }
 
 module.exports = router;
