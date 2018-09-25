@@ -29,11 +29,13 @@ router.route('/callback')
       console.log(req.body);
       console.log('----- req ------');
       const data = req.body;
-      data.entry.forEach(function(singleEntry) {
-        singleEntry.messaging.forEach(function(messagingEvent) {
-          message_handler.handleSingleMessageEvent(req, messagingEvent);
+      if (data.entry) {
+        data.entry.forEach(function(singleEntry) {
+          singleEntry.messaging.forEach(function(messagingEvent) {
+            message_handler.handleSingleMessageEvent(req, messagingEvent);
+          });
         });
-      });
+      }
 
       return res.status(200).send("OK");
     });
