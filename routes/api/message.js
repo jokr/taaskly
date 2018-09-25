@@ -26,6 +26,7 @@ router.route('/callback')
     (req, res, next) => {
       console.log('----- req ------');
       console.log(JSON.stringify(req.headers));
+      console.log(req.body);
       console.log('----- req ------');
       const data = req.body;
       data.entry.forEach(function(singleEntry) {
