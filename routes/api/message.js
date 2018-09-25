@@ -26,14 +26,16 @@ router.route('/callback')
     (req, res, next) => {
       console.log('----- req ------');
       console.log(JSON.stringify(req.headers));
-      console.log(req.body);
+      console.log(JSON.stringify(req.body));
       console.log('----- req ------');
       const data = req.body;
       if (data.entry) {
         data.entry.forEach(function(singleEntry) {
-          singleEntry.messaging.forEach(function(messagingEvent) {
-            message_handler.handleSingleMessageEvent(req, messagingEvent);
-          });
+          if (singleEntry.messaging) {
+            singleEntry.messaging.forEach(function(messagingEvent) {
+              message_handler.handleSingleMessageEvent(req, messagingEvent);
+            });
+          }
         });
       }
 
