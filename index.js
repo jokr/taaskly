@@ -3,6 +3,7 @@
 const bodyParser = require('body-parser');
 const env = require('node-env-file');
 const express = require('express');
+const helmet = require('helmet');
 const httpsRedirect = require('express-https-redirect');
 const logger = require('heroku-logger')
 const morgan = require('morgan');
@@ -31,6 +32,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(helmet.noCache());
 
 morgan.token('uid', (req, res) => req.user ? req.user.id : null);
 app.use(morgan(':method :url :status :response-time ms :uid'));

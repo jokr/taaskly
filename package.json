@@ -17,6 +17,7 @@
     "express": "^4.16.2",
     "express-https-redirect": "^1.0.0",
     "express-session": "^1.15.6",
+    "helmet": "^3.14.0",
     "heroku-logger": "^0.3.0",
     "html-pdf": "^2.2.0",
     "moment": "^2.20.1",

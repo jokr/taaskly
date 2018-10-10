@@ -130,4 +130,9 @@ router.route('/link_account')
     return res.redirect('/link_account_confirm');
   });
 
+router.route('/picker')
+  .get((req, res, next) => {
+    res.render('picker');
+  });
+
 module.exports = router;

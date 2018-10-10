@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h2= Picker
+  p Example of all the various native pickers.
+  div
+    button#google-auth(disabled="true") Google
+    #google-result(style="margin-top: 4px")
+
+block foot
+  script(type="text/javascript" src="/js/googlepicker.js")
+  script(type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad")
