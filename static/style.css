@@ -252,3 +252,22 @@ p.document {
 .sharedposts-info p {
   margin: 0;
 }
+
+.picker-buttons {
+  margin: 12px 0;
+}
+
+.picker-buttons button {
+  margin-right: 8px;
+}
+
+.picker-result {
+  margin: 12px 0;
+}
+
+.picker-result p {
+  font-family: monospace;
+  font-size: 14px;
+  padding: 4px;
+  background-color: whitesmoke;
+}

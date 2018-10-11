@@ -132,7 +132,7 @@ router.route('/link_account')
 
 router.route('/picker')
   .get((req, res, next) => {
-    res.render('picker');
+    res.render('picker', {msftToken: req.user ? req.user.msftToken : null});
   });
 
 module.exports = router;

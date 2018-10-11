@@ -46,6 +46,13 @@ const User = sequelize.define('user', {
     allowNull: true,
     unique: true,
   },
+  msftToken: {
+    type: Sequelize.STRING(2000),
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: true,
+  }
 });
 
 const Task = sequelize.define('task', {

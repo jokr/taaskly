@@ -1,12 +1,22 @@
 extends layout
 
+block head
+  script.
+    const msftToken = '#{msftToken || null}';
+
 block content
   h2= Picker
   p Example of all the various native pickers.
-  div
+  .picker-buttons
     button#google-auth(disabled="true") Google
-    #google-result(style="margin-top: 4px")
+    button#msft-auth(disabled=msftToken || !user) Microsoft Login
+    button#msft-picker-onedrive(disabled) OneDrive Picker
+    button#msft-picker-sharepoint(disabled) SharePoint Picker
+  .picker-result
+    #result(style="margin-top: 4px")
 
 block foot
   script(type="text/javascript" src="/js/googlepicker.js")
+  script(type="text/javascript" src="/js/msftpicker.js")
   script(type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad")
+  script(type="text/javascript" src="https://js.live.net/v7.2/OneDrive.debug.js")

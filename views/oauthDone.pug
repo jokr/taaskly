@@ -1,0 +1,22 @@
+extends layout
+
+block head
+  script.
+    setTimeout(() => {
+      console.log(window.opener);
+      if (window.opener && window.opener.msftCallback) {
+        window.opener.msftCallback('#{details.access_token}');
+      }
+      window.close();
+    }, 3000);
+    
+block navigation
+
+block content
+  h1 OAuth Done
+  p.
+    Your Taaskly account #{user.username} completed the OAuth flow.
+  p= message
+  p.
+    This dialog will close in  in 3 seconds.
+  pre= JSON.stringify(details, null, 2)

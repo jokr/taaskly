@@ -3,6 +3,7 @@
 const express = require('express');
 const logger = require('heroku-logger');
 const Op = require('sequelize').Op;
+const request = require('request-promise-native');
 
 const db = require.main.require('./db');
 const graph = require.main.require('./graph');
@@ -162,6 +163,42 @@ router.route('/task/:id')
     .findById(req.params.id, {include: [{ model: db.models.user, as: 'owner' }]})
     .then(task => res.render('task', {task})),
   );
+
+router.route('/oauth/msft/')
+  .get((req, res, next) => {
+    request({
+        method: 'POST',
+        uri: 'https://login.microsoftonline.com/organizations/oauth2/v2.0/token',
+        form: {
+          client_id: process.env.MSFT_CLIENT_ID,
+          client_secret: process.env.MSFT_CLIENT_SECRET,
+          grant_type: 'authorization_code',
+          scope: 'files.read.all',
+          redirect_uri: process.env.BASE_URL + 'oauth/msft',
+          code: req.query.code,
+        },
+        json: true
+      })
+      .then(response => {
+        req.user
+          .update({
+            msftToken: response.access_token
+          })
+          .then(() => res.render('oauthDone', {
+            message: 'Saved Microsoft access token.',
+            details: response,
+          }))
+          .catch(next)
+      })
+      .catch((error) => {
+        return res
+          .status(500)
+          .render('error', {
+            message: 'Could not obtain Microsoft token',
+            details: JSON.stringify(error, null, 2)
+          });
+      });
+  });
 
 router.route('/link_account_confirm')
   .get((req, res ,next) => {

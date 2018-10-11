@@ -50,12 +50,12 @@ function createPicker() {
 }
 
 function pickerCallback(data) {
-  console.log(data);
   var url = 'nothing';
   if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
     const doc = data[google.picker.Response.DOCUMENTS][0];
     url = doc[google.picker.Document.URL];
+    const element = document.createElement('p');
+    element.appendChild(document.createTextNode(url));
+    document.getElementById('result').appendChild(element);
   }
-  const message = `You picked: ${url}`;
-  document.getElementById('google-result').innerHTML = message;
 }
