@@ -3,6 +3,7 @@
 const bodyParser = require('body-parser');
 const env = require('node-env-file');
 const express = require('express');
+const httpsRedirect = require('express-https-redirect');
 const logger = require('heroku-logger')
 const morgan = require('morgan');
 const session = require('express-session');
@@ -18,6 +19,9 @@ app.set('port', (process.env.PORT || 5000));
 app.set('view engine', 'pug');
 app.set('json spaces', 2);
 
+if (process.env.HTTPS_REDIRECT === 'true') {
+  app.use(httpsRedirect());
+}
 app.use(express.static('static'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
