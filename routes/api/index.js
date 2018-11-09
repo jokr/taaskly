@@ -114,10 +114,10 @@ router.get('*', (req, res, next) => {
   if (!params['hub.mode'] && !params['hub.challenge'] && !params['hub.verify_token']) {
     next();
   }
-  console.log(params['hub.verify_token']);
-  if (params['hub.verify_token'] !== process.env.VERIFY_TOKEN) {
-    throw new BadRequest('Invalid verify token.');
-  }
+  // console.log(params['hub.verify_token']);
+  // if (params['hub.verify_token'] !== process.env.VERIFY_TOKEN) {
+  //   throw new BadRequest('Invalid verify token.');
+  // }
   return res.status(200).send(params['hub.challenge']);
 });
 router.post('*', logAndValidateCallback);
