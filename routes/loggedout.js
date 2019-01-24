@@ -130,4 +130,17 @@ router.route('/link_account')
     return res.redirect('/link_account_confirm');
   });
 
+router.route('/delete_callbacks')
+  .post((req, res, next) => db.models.callback
+    .destroy({truncate: true})
+    .then(() => res.redirect('/callbacks')),
+  );
+
+router.route('/callbacks')
+  .get((req, res, next) => db.models.callback
+    .findAll({order: [['createdAt', 'DESC']]})
+    .then(callbacks => res.render('callbacks', {callbacks}))
+    .catch(next),
+  );
+
 module.exports = router;
