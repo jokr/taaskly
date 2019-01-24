@@ -11,7 +11,7 @@ const BadRequest = require('./BadRequest');
 
 const router = express.Router();
 
-const validate = process.env.NODE_ENV === 'true';
+const validate = process.env.VALIDATE_XHUB !== 'false';
 
 function errorHandler(err, req, res, next) {
   logger.error(err);
@@ -61,9 +61,11 @@ function logAndValidateCallback(req, res, next) {
     .create({ path: req.originalUrl, headers: req.headers, body: req.body })
     .then()
     .catch(error => logger.warn(error));
-  if (validate && !req.xhub) {
+  if (!req.xhub) {
     logger.warn('missing x-hub-signature');
-    throw new BadRequest('Invalid x-hub-signature.');
+    if (validate) {
+      throw new BadRequest('Invalid x-hub-signature.');
+    }
   }
   next();
 }
