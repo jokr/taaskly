@@ -4,6 +4,11 @@ block content
   h2 Recent Callbacks
   p.
     A list of all raw webhook callbacks.
+  div(style="margin-bottom: 10px")
+    a(href="?topic=page").button Only page
+    a(href="?topic=group").button Only group
+    a(href="?topic=link").button Only link
+    a(href="?topic=all").button All
   form(action="/delete_callbacks" method="post")
     button(type="submit") Clear
 

@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const express = require('express');
 const logger = require('heroku-logger');
 const passport = require('passport');
+const Op = require('sequelize').Op;
 
 const db = require('../db');
 const graph = require('../graph');
@@ -138,9 +139,28 @@ router.route('/delete_callbacks')
 
 router.route('/callbacks')
   .get((req, res, next) => db.models.callback
-    .findAll({order: [['createdAt', 'DESC']]})
+    .findAll({
+      where: filterCallbacks(req),
+      order: [['createdAt', 'DESC']]
+    })
     .then(callbacks => res.render('callbacks', {callbacks}))
     .catch(next),
   );
+
+function filterCallbacks(req) {
+  const filter = req.query.topic;
+  switch (filter) {
+    case 'page':
+    case 'group':
+    case 'link':
+      return {
+        path: {
+          [Op.like]: '%' + filter + '%'
+        }
+      };
+    default:
+      return {};
+  }
+}
 
 module.exports = router;
