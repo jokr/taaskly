@@ -122,7 +122,7 @@ router.get('*', (req, res, next) => {
 router.post('*', logAndValidateCallback);
 router.use('/link', require('./link'));
 router.use('/page', require('./page'));
-router.use('*', (req, res, next) => res.status(404).send());
+router.use('*', (req, res, next) => res.status(200).send());
 router.use(errorHandler);
 
 module.exports = router;
