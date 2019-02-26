@@ -58,42 +58,42 @@ router.route('/community_install')
         .render('error', {message: 'No code received.'});
     }
 
-    console.log('---------- INSTALL -----------');
-    console.log(req.query.code);
-    console.log('---------- INSTALL -----------');
-    // graph('oauth/access_token')
-    //   .qs({
-    //     client_id: process.env.APP_ID,
-    //     client_secret: process.env.APP_SECRET,
-    //     redirect_uri: process.env.APP_REDIRECT,
-    //     code: req.query.code,
-    //   })
-    //   .send()
-    //   .then(tokenResponse => graph('community')
-    //     .token(tokenResponse.access_token)
-    //     .qs({ fields: 'name' })
-    //     .send()
-    //     .then(communityResponse => db.models.community
-    //       .findById(communityResponse.id)
-    //       .then(community => {
-    //         if (community) {
-    //           return community.update({accessToken: tokenResponse.access_token});
-    //         } else {
-    //           return db.models.community.create({
-    //             id: communityResponse.id,
-    //             name: communityResponse.name,
-    //             accessToken: tokenResponse.access_token,
-    //           });
-    //         }
-    //       })
-    //     )
-    //   )
-    //   .then(community => {
-    //     const redirect = req.query.redirect_uri;
-    //     const state = req.query.state;
-    //     res.render('installSuccess', {community, state, redirect});
-    //   })
-    //   .catch(next);
+    // console.log('---------- INSTALL -----------');
+    // console.log(req.query.code);
+    // console.log('---------- INSTALL -----------');
+    graph('oauth/access_token')
+      .qs({
+        client_id: process.env.APP_ID,
+        client_secret: process.env.APP_SECRET,
+        redirect_uri: process.env.APP_REDIRECT,
+        code: req.query.code,
+      })
+      .send()
+      .then(tokenResponse => graph('community')
+        .token(tokenResponse.access_token)
+        .qs({ fields: 'name' })
+        .send()
+        .then(communityResponse => db.models.community
+          .findById(communityResponse.id)
+          .then(community => {
+            if (community) {
+              return community.update({accessToken: tokenResponse.access_token});
+            } else {
+              return db.models.community.create({
+                id: communityResponse.id,
+                name: communityResponse.name,
+                accessToken: tokenResponse.access_token,
+              });
+            }
+          })
+        )
+      )
+      .then(community => {
+        const redirect = req.query.redirect_uri;
+        const state = req.query.state;
+        res.render('installSuccess', {community, state, redirect});
+      })
+      .catch(next);
   });
 
 router.route('/link_account')
