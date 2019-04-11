@@ -7,7 +7,7 @@ block content
   h2 Webhook Subscriptions
   form(action="/admin/subscribe" method="post")
     button(type="submit") Subscribe
-  button(type="button", onclick="window.open('https://work.mengk.sb.facebook.com/v3.2/dialog/work_app_install?client_id=329713124440482&redirect_uri=https%3A%2F%2Fkaizhi.me','MyWindow','width=600,height=800');") Install
+  button(type="button", onclick="window.open('https://work.mengk.sb.facebook.com/v3.2/dialog/work_app_install?app_id=329713124440482&redirect_uri=https%3A%2F%2Fkaizhi.me','MyWindow','width=600,height=800');") Install
   if subscriptions.length === 0
     p No active webhook subscriptions.
   else
