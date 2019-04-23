@@ -1,11 +1,12 @@
 extends layout
 
 block head
-  meta(http-equiv="refresh" content="3;url="+redirect)
+  meta(http-equiv="refresh" content="10;url="+redirect)
     
 block navigation
 
 block content
+  script(src='/js/installSuccess.js')
   h1 Community Installed
   p.
     Taaskly has been successfuly installed on the community #[strong= community.name].
@@ -14,6 +15,9 @@ block content
     pre= state
   else
     p No state param has been passed.
-  p This site will redirect back to Workplace in 3 seconds:
-  pre= redirect
+  if redirect
+    p This site will redirect back to Workplace in 10 seconds:
+    pre= redirect
+  else
+    p This window will close in 3 seconds.
     
