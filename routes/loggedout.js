@@ -69,7 +69,9 @@ router.route('/community_install')
         code: req.query.code,
       })
       .send()
-      .then(tokenResponse => graph('community')
+      .then(tokenResponse => {
+        console.log(tokenResponse);
+        return graph('community')
         .token(tokenResponse.access_token)
         .qs({ fields: 'name' })
         .send()
@@ -87,7 +89,7 @@ router.route('/community_install')
             }
           })
         )
-      )
+      })
       .then(community => {
         const redirect = req.query.redirect_uri;
         const state = req.query.state;
