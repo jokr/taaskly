@@ -6,7 +6,8 @@ block head
 block navigation
 
 block content
-  script(src='/js/installSuccess.js')
+  if !redirect
+    script(src='/js/installSuccess.js')
   h1 Community Installed
   p.
     Taaskly has been successfuly installed on the community #[strong= community.name].
