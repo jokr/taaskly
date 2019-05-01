@@ -21,9 +21,8 @@ block content
             input.checkbox-input(type='checkbox', name=`permissions[]`, value=val, id=`perm_${val}`)
             label(for=`perm_${val}`)=val
     div.form-group
-      p Give it a name:
-        label(for='suggested_page_name') Email
-        input.form-control(type='text' id='suggested_page_name' placeholder='Bot name' name='suggested_page_name')
+      label(for='suggested_page_name') Bot name:
+      input.form-control(type='text' id='suggested_page_name' placeholder='Bot name' name='suggested_page_name')
     button(type="submit") Install
 
   h2 Webhook Subscriptions
