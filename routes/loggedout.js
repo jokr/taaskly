@@ -50,6 +50,52 @@ router.route('/register')
       });
   });
 
+router.route('/page_install')
+  .get((req, res, next) => {
+    if (!req.query.code) {
+      return res
+        .status(400)
+        .render('error', {message: 'No code received.'});
+    }
+    graph('oauth/access_token')
+      .qs({
+        client_id: process.env.APP_ID,
+        client_secret: process.env.APP_SECRET,
+        redirect_uri: process.env.BASE_URL + '/page_install',
+        code: req.query.code,
+      })
+      .send()
+      .then(tokenResponse => {
+        return Promise.all([
+          graph('me')
+            .token(tokenResponse.access_token)
+            .qs({ fields: 'name' })
+            .send(),
+          graph('community')
+            .token(tokenResponse.access_token)
+            .qs({ fields: 'install,name' })
+            .send()
+        ])
+        .then(responses => {
+          const pageResponse = responses[0];
+          const communityResponse = responses[1];
+          return db.models.page.create({
+            id: pageResponse.id,
+            name: pageResponse.name,
+            accessToken: tokenResponse.access_token,
+            communityId: communityResponse.id,
+            communityName: communityResponse.name,
+            installId: communityResponse.install.id,
+          });
+        })}
+      )
+      .then(page => {
+        const state = req.query.state;
+        res.render('pageInstallSuccess', {page, state});
+      })
+      .catch(next);
+  });
+
 router.route('/community_install')
   .get((req, res, next) => {
     if (!req.query.code) {

@@ -4,6 +4,25 @@ block content
   h2 Admin Panel
   p.
     Various information about the current status of the application.
+
+  h2 Workplace Install (with full perms)
+  button(type="button", onclick="window.open('https://work.mengk.sb.facebook.com/v3.2/dialog/work/app_install?app_id=329713124440482&redirect_uri=https%3A%2F%2Fscott-taaskly.herokuapp.com%2Fcommunity_install%0D%0A','wp','width=800,height=1000');") Install
+
+  h2 Workplace Install (with selected perms)
+  form(action="https://work.mengk.sb.facebook.com/v3.2/dialog/work/app_install" method="get" onsubmit="window.open('', 'wp', 'width=800,height=1000'); this.target = 'wp';")
+    input.form-control(type="hidden", name="app_id", value=329713124440482)
+    input.form-control(type="hidden", name="redirect_uri", value="https://scott-taaskly.herokuapp.com/page_install")
+    div.form-group
+      p Choose permissions required:
+        each val in ["link_unfurling", "bot_mention", "message", "read_user_email"]
+          div.checkbox-inline
+            input.checkbox-input(type='checkbox', name=`permissions[]`, value=val, id=`perm_${val}`)
+            label(for=`perm_${val}`)=val
+    div.form-group
+      label(for='suggested_page_name') Bot name:
+      input.form-control(type='text' id='suggested_page_name' placeholder='Bot name' name='suggested_page_name')
+    button(type="submit") Install
+
   h2 Webhook Subscriptions
   form(action="/admin/subscribe" method="post")
     button(type="submit") Subscribe
