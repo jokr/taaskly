@@ -101,6 +101,42 @@ const Document = sequelize.define('document', {
   },
 });
 
+const Page = sequelize.define('page', {
+  id: {
+    type: Sequelize.BIGINT,
+    primaryKey: true,
+  },
+  name: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+  },
+  accessToken: {
+    type: Sequelize.STRING(510),
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+  },
+  communityId: {
+    type: Sequelize.BIGINT,
+    allowNull: false,
+  },
+  communityName: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+    },
+    allowNull: false,
+  },
+  installId: {
+    type: Sequelize.BIGINT,
+    allowNull: false,
+  },
+});
+
 const Community = sequelize.define('community', {
   id: {
     type: Sequelize.BIGINT,
@@ -151,7 +187,7 @@ let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() ===
 let sync = process.env.SYNC_TABLES && process.env.SYNC_TABLES.toLowerCase() === 'true';
 
 if (sync || force) {
-  Promise.all([Community.sync({force}), Callback.sync({force})])
+  Promise.all([Community.sync({force}), Callback.sync({force}), Page.sync({force})])
     .then(() => User.sync({force}))
     .then(() => Folder.sync({force}))
     .then(() => Promise.all([Document.sync({force}), Task.sync({force})]))
