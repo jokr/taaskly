@@ -111,25 +111,27 @@ router.route('/community_install')
         code: req.query.code,
       })
       .send()
-      .then(tokenResponse => graph('community')
-        .token(tokenResponse.access_token)
-        .qs({ fields: 'name' })
-        .send()
-        .then(communityResponse => db.models.community
-          .findById(communityResponse.id)
-          .then(community => {
-            if (community) {
-              return community.update({accessToken: tokenResponse.access_token});
-            } else {
-              return db.models.community.create({
-                id: communityResponse.id,
-                name: communityResponse.name,
-                accessToken: tokenResponse.access_token,
-              });
-            }
-          })
-        )
-      )
+      .then(tokenResponse => {
+        console.log(tokenResponse);
+        return graph('community')
+          .token(tokenResponse.access_token)
+          .qs({ fields: 'name' })
+          .send()
+          .then(communityResponse => db.models.community
+            .findById(communityResponse.id)
+            .then(community => {
+              if (community) {
+                return community.update({accessToken: tokenResponse.access_token});
+              } else {
+                return db.models.community.create({
+                  id: communityResponse.id,
+                  name: communityResponse.name,
+                  accessToken: tokenResponse.access_token,
+                });
+              }
+            })
+          );
+      })
       .then(community => {
         const redirect = req.query.redirect_uri;
         const state = req.query.state;
