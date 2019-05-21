@@ -95,7 +95,7 @@ function webhookSubscribe(topic, fields) {
     .appSecret()
     .qs({
       object: topic,
-      callback_url: `https://www.taaskly.com/api/${topic}/callback`,
+      callback_url: process.env.BASE_URL+`api/${topic}/callback`,
       verify_token: process.env.VERIFY_TOKEN,
       fields: fields,
     })
