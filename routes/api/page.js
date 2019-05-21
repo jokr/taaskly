@@ -17,17 +17,57 @@ router.route('/callback')
       throw new BadRequest('Invalid topic.');
     }
     res.status(200).send();
+
+    const messageHandles = req.body.entry
+      .filter(entry => !!entry.messaging)
+      .map(handleMessage);
+
     const mentionHandles = req.body.entry
       .map(entry => entry.changes)
       .reduce((acc, val) => acc.concat(val), [])
-      .filter(change => change.field === 'mention')
+      .filter(change => change && change.field === 'mention')
       .map(change => change.value)
       .filter(value => value.verb === 'add')
       .map(handleMention);
     Promise
-      .all(mentionHandles)
+      .all(mentionHandles.concat(messageHandles))
       .then();
   });
+
+function handleMessage(entry) {
+  const pageId = entry.id;
+  db.models.page.findById(pageId)
+    .then(page => {
+      if (page === null) {
+        throw new BadRequest(`Could not find page for message webhook: ${pageId}`);
+      }
+      graph('me')
+        .token(page.accessToken)
+        .qs({fields: 'name'})
+        .send()
+        .then(pageResponse => {
+          const messageProcessors = entry.messaging.map(messaging => graph('me/messages')
+            .token(page.accessToken)
+            .body({
+              recipient: {
+                id: messaging.sender.id
+              }, 
+              message: {
+                text: 'I\'m ' + pageResponse.name + '. Received: ' + messaging.message.text
+              }
+            })
+            .post()
+            .send()
+          );
+          Promise
+            .all(messageProcessors)
+            .then();
+        });
+    })
+    .catch(err => {
+      logger.error(err.message);
+    })
+}
 
 function handleMention(value) {
   const communityId = parseInt(value.community.id);
