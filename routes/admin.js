@@ -13,6 +13,7 @@ router.use((req, res, next) => {
   res.locals.navigation = [
     {name: 'Users', path: '/admin/users'},
     {name: 'Communities', path: '/admin/communities'},
+    {name: 'Installs', path: '/admin/installs'},
     {name: 'Callbacks', path: '/callbacks'},
   ];
   next();
@@ -64,6 +65,28 @@ router.route('/communities')
     .then(communities => {
       const state = crypto.randomBytes(12).toString('hex');
       res.render('communities', {communities, state});
+    })
+    .catch(next),
+  );
+
+router.route('/installs')
+  .get((req, res, next) => db.models.page
+    .findAll({order: [['id', 'ASC']]})
+    .then(pages => Promise.all(
+      pages.map(page =>
+        graph('community')
+          .qs({fields: 'id,install'})
+          .token(page.accessToken)
+          .send()
+          .then(response => {
+            page.permissions = response.install.permissions;
+            page.installType = response.install.install_type;
+            return page;
+          }),
+    )))
+    .then(pages => {
+      const state = crypto.randomBytes(12).toString('hex');
+      res.render('installs', {pages, state});
     })
     .catch(next),
   );
