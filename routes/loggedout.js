@@ -79,14 +79,25 @@ router.route('/page_install')
         .then(responses => {
           const pageResponse = responses[0];
           const communityResponse = responses[1];
-          return db.models.page.create({
-            id: pageResponse.id,
-            name: pageResponse.name,
-            accessToken: tokenResponse.access_token,
-            communityId: communityResponse.id,
-            communityName: communityResponse.name,
-            installId: communityResponse.install.id,
-          });
+          return db.models.page
+            .findById(pageResponse.id)
+            .then(page => {
+              if (page) {
+                return page.update({
+                  name: pageResponse.name,
+                  accessToken: tokenResponse.access_token,
+                });
+              } else {
+                return db.models.page.create({
+                  id: pageResponse.id,
+                  name: pageResponse.name,
+                  accessToken: tokenResponse.access_token,
+                  communityId: communityResponse.id,
+                  communityName: communityResponse.name,
+                  installId: communityResponse.install.id,
+                });
+              }
+            });
         })}
       )
       .then(page => {
@@ -112,7 +123,6 @@ router.route('/community_install')
       })
       .send()
       .then(tokenResponse => {
-        console.log(tokenResponse);
         return graph('community')
           .token(tokenResponse.access_token)
           .qs({ fields: 'name' })

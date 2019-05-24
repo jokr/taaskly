@@ -1,0 +1,48 @@
+extends layout
+
+block content
+  h2 Install to Workplace
+  form(action="https://work.facebook.com/v3.2/dialog/work/app_install" method="get" onsubmit="window.open('', 'wp', 'width=800,height=1000'); this.target = 'wp';")
+    input.form-control(type="hidden", name="app_id", value=`${process.env.APP_ID}`)
+    input.form-control(type="hidden", name="state", value=`${state}`)
+    input.form-control(type="hidden", name="redirect_uri", value=`${process.env.BASE_URL}/page_install`)
+    div.form-group
+      p Choose permissions required:
+        each val in ["link_unfurling", "bot_mention", "message", "read_user_email"]
+          div.checkbox-inline
+            input.checkbox-input(type='checkbox', name=`permissions[]`, value=val, id=`perm_${val}`)
+            label(for=`perm_${val}`)=val
+    div.form-group
+      label(for='suggested_page_name') Bot name:
+      input.form-control(type='text' id='suggested_page_name' placeholder='Bot name' name='suggested_page_name')
+    button(type="submit") Install
+
+  h2 All Installs
+  table.pages
+    thead
+      tr
+        th(style="width: 200px") Page ID
+        th Name
+        th Created Time
+        th Install Type
+        th Permissions
+        th Upgrade
+    tbody
+      each page in pages
+        tr
+          td= page.id
+          td= page.name
+          td= moment(page.createdAt).fromNow()
+          td= page.installType.toLowerCase()
+          td= page.permissions.join(', ').toLowerCase()
+          td
+            form(action="https://work.facebook.com/v3.2/dialog/work/app_upgrade" method="get" onsubmit="window.open('', 'wp', 'width=800,height=1000'); this.target = 'wp';")
+              input.form-control(type="hidden", name="redirect_uri", value=`${process.env.BASE_URL}/page_install`)
+              input.form-control(type="hidden", name="install_id", value=`${page.installId}`)
+              div.form-group
+                p Choose permissions required:
+                  each val in ["link_unfurling", "bot_mention", "message", "read_user_email"]
+                    div.checkbox-inline
+                      input.checkbox-input(type='checkbox', name=`permissions[]`, value=val, id=`perm_${val}_${page.id}`)
+                      label(for=`perm_${val}_${page.id}`)=val
+              button(type="submit") Upgrade

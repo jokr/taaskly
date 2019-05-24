@@ -3,10 +3,16 @@ extends layout
 block navigation
 
 block content
-  script(src='/js/pageInstallSuccess.js')
+  script.
+    window.onload = function() {
+      setTimeout(function(){
+        window.opener.location.reload();
+        self.close();
+      }, 3000);
+    };
   h1 Community Installed
   p.
-    Taaskly has been successfuly installed on the community #[strong= page.communityName] as #[strong = page.name].
+    Taaskly has been successfuly installed on the community #[strong= page.communityName] as #[strong= page.name].
   if state
     p The following state param has been passed:
     pre= state
