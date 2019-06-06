@@ -5,13 +5,20 @@ block content
   p.
     Various information about the current status of the application.
 
+  - const dialogBase = `https://work.jokr.sb.workplace.com/${graphVersion}/dialog/work`;
+  - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
+  - const onsubmit = `window.open('', 'wp', '${dialogFeatures}'); this.target = 'wp'`;
+
   h2 Workplace Install (with full perms)
-  button(type="button", onclick="window.open('https://work.facebook.com/v3.2/dialog/work/app_install?app_id=329713124440482&redirect_uri=https%3A%2F%2Fscott-taaskly.herokuapp.com%2Fcommunity_install%0D%0A','wp','width=800,height=1000');") Install
+  form(action=dialogBase + '/app_install' method="get" onsubmit=onsubmit)
+    input(type="hidden", name="app_id", value=appID)
+    input(type="hidden", name="redirect_uri", value=redirectURI)
+    button(type="submit") Install
 
   h2 Workplace Install (with selected perms)
-  form(action="https://work.facebook.com/v3.2/dialog/work/app_install" method="get" onsubmit="window.open('', 'wp', 'width=800,height=1000'); this.target = 'wp';")
-    input.form-control(type="hidden", name="app_id", value=329713124440482)
-    input.form-control(type="hidden", name="redirect_uri", value="https://scott-taaskly.herokuapp.com/page_install")
+  form(action=dialogBase + '/app_install' method="get" onsubmit=onsubmit)
+    input(type="hidden", name="app_id", value=appID)
+    input(type="hidden", name="redirect_uri", value=redirectURI)
     div.form-group
       p Choose permissions required:
         each val in ["link_unfurling", "bot_mention", "message", "read_user_email"]
@@ -24,8 +31,9 @@ block content
     button(type="submit") Install
 
   h2 Workplace Install Upgrade
-  form(action="https://work.mengk.sb.facebook.com/v3.2/dialog/work/app_upgrade" method="get" onsubmit="window.open('', 'wp', 'width=800,height=1000'); this.target = 'wp';")
-    input.form-control(type="hidden", name="redirect_uri", value="https://scott-taaskly.herokuapp.com/page_install")
+  form(action=dialogBase + '/app_upgrade' method="get" onsubmit=onsubmit)
+  form(action="https://work.mengk.sb.workplace.com/v3.2/dialog/work/app_upgrade" method="get" onsubmit="window.open('', 'wp', 'width=800,height=1000'); this.target = 'wp';")
+    input(type="hidden", name="redirect_uri", value=redirectURI)
     div.form-group
       p Choose permissions required:
         each val in ["link_unfurling", "bot_mention", "message", "read_user_email"]

@@ -19,12 +19,14 @@ router.use((req, res, next) => {
 });
 
 router.route('/')
-  .get((req, res, next) => graph('app/subscriptions')
-    .appSecret()
-    .send()
-    .then(subscriptions => res.render('admin', {subscriptions: subscriptions.data}))
-    .catch(next),
-  );
+  .get((req, res, next) => {
+    res.render('admin', {
+      appID: process.env.APP_ID,
+      graphVersion: process.env.GRAPH_VERSION || 'v3.2',
+      redirectURI: process.env.APP_REDIRECT,
+      subscriptions: []
+    })
+  });
 
 router.route('/subscribe')
   .post((req, res, next) =>
