@@ -24,6 +24,7 @@ router.route('/')
       appID: process.env.APP_ID,
       graphVersion: process.env.GRAPH_VERSION || 'v3.2',
       redirectURI: process.env.APP_REDIRECT,
+      userRedirectURI: process.env.APP_USER_REDIRECT,
       subscriptions: []
     })
   });

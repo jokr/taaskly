@@ -20,6 +20,7 @@ if (process.env.DATABASE_URL) {
     process.env.DB_PASS,
     {
       dialect: 'sqlite',
+      storage: 'database.sqlite',
       logging: sequelizeLog,
     }
   );
@@ -39,7 +40,7 @@ const User = sequelize.define('user', {
     validate: {
       notEmpty: true,
     },
-    allowNull: false,
+    allowNull: true,
   },
   workplaceID: {
     type: Sequelize.BIGINT,

@@ -1,13 +1,25 @@
 extends layout
 
 block content
+  - const dialog = `https://work.workplace.com/${graphVersion}/dialog/oauth`;
+  - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
+  - const onsubmit = `window.open('', 'wp', '${dialogFeatures}'); this.target = 'wp'`;
   h2 Login
-  p Please enter your username and password.
-  form.small(action="/login" method="post")
-    label.label Username
-      input(type="text" name="username" required)
-    label.label Password
-      input(type="password" name="password" required)
-    button(type="submit") Login
+  div(style="display: flex")
+    div(style="width: 250px; border-right: 1px solid; margin: 12px; align-items: center; justify-content: center; display: flex")
+      form(action=dialog method="get" onsubmit=onsubmit)
+        input(type="hidden", name="app_id", value=appID)
+        input(type="hidden", name="redirect_uri", value=userRedirectURI)
+        input(type="hidden", name="scope", value="openid")
+        input(type="hidden", name="response_type", value="id_token")
+        button(type="submit") Login with Workplace
+    div(style="width: 250px; margin: 12px")
+      p Please enter your username and password.
+      form.small(action="/login" method="post")
+        label.label Username
+          input(type="text" name="username" required)
+        label.label Password
+          input(type="password" name="password" required)
+        button(type="submit") Login
   p
     a(href='/register') Not yet registered?

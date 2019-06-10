@@ -4,9 +4,11 @@ const base64url = require('base64url');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const logger = require('heroku-logger');
-const passport = require('passport');
 const Op = require('sequelize').Op;
+const passport = require('passport');
+const request = require('request-promise-native');
 
 const db = require('../db');
 const graph = require('../graph');
@@ -17,7 +19,12 @@ router.route('/')
   .get((req, res, next) => res.render('home'));
 
 router.route('/login')
-  .get((req, res, next) => res.render('login'))
+  .get((req, res, next) => res.render('login', {
+    appID: process.env.APP_ID,
+    graphVersion: process.env.GRAPH_VERSION || 'v3.2',
+    redirectURI: process.env.APP_REDIRECT,
+    userRedirectURI: process.env.APP_USER_REDIRECT,
+  }))
   .post(
     passport.authenticate('local', { failureRedirect: '/login' }),
     (req, res, next) => {
@@ -112,7 +119,6 @@ router.route('/community_install')
       })
       .send()
       .then(tokenResponse => {
-        console.log(tokenResponse);
         return graph('community')
           .token(tokenResponse.access_token)
           .qs({ fields: 'name' })
@@ -178,6 +184,53 @@ router.route('/link_account')
     }
     return res.redirect('/link_account_confirm');
   });
+
+router.route('/user_install')
+  .get((req, res, next) => {
+    request('https://www.workplace.com/.well-known/openid/', { json: true })
+      .then(pubKeys => {
+        if (req.query.id_token) {
+          const token = verifyToken(pubKeys.keys, req.query.id_token);
+          res.render('userInstallSuccess', {response: token});
+          return;
+        }
+        if (req.query.code) {
+          graph('oauth/access_token')
+            .qs({
+              client_id: process.env.APP_ID,
+              client_secret: process.env.APP_SECRET,
+              redirect_uri: process.env.BASE_URL + '/user_install',
+              code: req.query.code,
+              grant_type: 'authorization_code',
+            })
+            .send()
+            .then(accessTokenResponse => {
+              let token = ''
+              if (accessTokenResponse.id_token) {
+                token = verifyToken(pubKeys.keys, req.query.id_token);
+                token = jwt.decode(accessTokenResponse.id_token, {complete: true});
+              }
+              res.render('userInstallSuccess', {response: {
+                code: req.query.code,
+                response: accessTokenResponse,
+                token: token,
+              }});
+            });
+          return;
+        }
+        res.render('error', {message: 'Expected either an id_token or code.'});
+      });
+  });
+
+function verifyToken(keys, idToken) {
+  const unverifiedToken = jwt.decode(idToken, {complete: true});
+  const pubKey = keys[unverifiedToken.header.kid];
+  return jwt.verify(idToken, pubKey, {
+    algorithms: ['RS256'],
+    audience: process.env.APP_ID,
+    issuer: 'https://workplace.com'
+  });
+}
 
 router.route('/delete_callbacks')
   .post((req, res, next) => db.models.callback
