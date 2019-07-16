@@ -14,19 +14,37 @@ router.use((req, res, next) => {
     {name: 'Users', path: '/admin/users'},
     {name: 'Communities', path: '/admin/communities'},
     {name: 'Callbacks', path: '/callbacks'},
+    {name: 'Install', path: '/admin/install'},
+    {name: 'Login', path: '/admin/login'},
+    {name: 'Subscriptions', path: '/admin/'}
   ];
   next();
 });
 
 router.route('/')
+  .get((req, res, next) => graph('app/subscriptions')
+    .appSecret()
+    .send()
+    .then(subscriptions => res.render('admin', {subscriptions: subscriptions.data}))
+    .catch(next)
+  );
+
+router.route('/login')
   .get((req, res, next) => {
-    res.render('admin', {
+    res.render('adminLogin', {
       appID: process.env.APP_ID,
       graphVersion: process.env.GRAPH_VERSION || 'v3.2',
-      redirectURI: process.env.APP_REDIRECT,
-      userRedirectURI: process.env.APP_USER_REDIRECT,
-      subscriptions: []
-    })
+      redirectURI: process.env.APP_USER_REDIRECT,
+    });
+  });
+
+router.route('/install')
+  .get((req, res, next) => {
+    res.render('adminInstall', {
+      appID: process.env.APP_ID,
+      graphVersion: process.env.GRAPH_VERSION || 'v3.2',
+      redirectURI: process.env.APP_USER_REDIRECT,
+    });
   });
 
 router.route('/subscribe')
