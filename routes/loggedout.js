@@ -187,40 +187,58 @@ router.route('/link_account')
 
 router.route('/user_install')
   .get((req, res, next) => {
-    request('https://www.workplace.com/.well-known/openid/', { json: true })
-      .then(pubKeys => {
-        if (req.query.id_token) {
-          const token = verifyToken(pubKeys.keys, req.query.id_token);
-          res.render('userInstallSuccess', {response: token});
-          return;
-        }
-        if (req.query.code) {
-          graph('oauth/access_token')
-            .qs({
-              client_id: process.env.APP_ID,
-              client_secret: process.env.APP_SECRET,
-              redirect_uri: process.env.BASE_URL + '/user_install',
-              code: req.query.code,
-              grant_type: 'authorization_code',
-            })
-            .send()
-            .then(accessTokenResponse => {
-              let token = ''
-              if (accessTokenResponse.id_token) {
-                token = verifyToken(pubKeys.keys, req.query.id_token);
-                token = jwt.decode(accessTokenResponse.id_token, {complete: true});
+    genObtainIdTokenPayload(req)
+      .then(token => {
+        const workplaceID = token.sub;
+        if (req.user) {
+          req.user
+            .update({workplaceID: workplaceID})
+            .then(() => res.render(
+              'userInstallSuccess',
+              {token, message: 'Linked your Taaskly account with your Workplace account.'}
+            ));
+        } else {
+          const user = db.models.user.findOne({where: {workplaceID: workplaceID}})
+            .then(user => {
+              if (user) {
+                req.login(user, err => {
+                  if (err) {
+                    return res.render(
+                      'userInstallSuccess',
+                      {token, message: 'Obtained id_token, but could not establish session.'}
+                    );
+                  }
+                  return res.render(
+                    'userInstallSuccess',
+                    {token, message: 'Logged you in. You can close this window and refresh the main window.'}
+                  );
+                });
+              } else {
+                return res.render('userInstallSuccess', {token});
               }
-              res.render('userInstallSuccess', {response: {
-                code: req.query.code,
-                response: accessTokenResponse,
-                token: token,
-              }});
             });
-          return;
         }
-        res.render('error', {message: 'Expected either an id_token or code.'});
       });
   });
+
+function genObtainIdTokenPayload(req) {
+  return request('https://www.workplace.com/.well-known/openid/', { json: true })
+    .then(pubKeys => {
+      if (req.query.id_token) {
+        return verifyToken(pubKeys.keys, req.query.id_token);
+      }
+      return graph('oauth/access_token')
+        .qs({
+          client_id: process.env.APP_ID,
+          client_secret: process.env.APP_SECRET,
+          redirect_uri: process.env.BASE_URL + '/user_install',
+          code: req.query.code,
+          grant_type: 'authorization_code',
+        })
+        .send()
+        .then(accessTokenResponse => verifyToken(pubKeys.keys, accessTokenResponse.id_token));
+    });
+}
 
 function verifyToken(keys, idToken) {
   const unverifiedToken = jwt.decode(idToken, {complete: true});
