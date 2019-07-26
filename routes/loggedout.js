@@ -221,6 +221,57 @@ router.route('/user_install')
       });
   });
 
+router.route('/delete_callbacks')
+  .post((req, res, next) => db.models.callback
+    .destroy({truncate: true})
+    .then(() => res.redirect('/callbacks')),
+  );
+
+router.route('/callbacks')
+  .get((req, res, next) => db.models.callback
+    .findAll({
+      where: filterCallbacks(req),
+      order: [['createdAt', 'DESC']]
+    })
+    .then(callbacks => res.render('callbacks', {callbacks}))
+    .catch(next),
+  );
+
+router.route('/devicelogin')
+  .post((req, res, next) => graph('device/login_status')
+    .post()
+    .clientToken()
+    .qs({code: req.body.code})
+    .send()
+    .then(response => handleIDToken(req, response.id_token))
+    .then(() => res.redirect('/documents'))
+    .catch(next)
+  );
+
+function handleIDToken(req, idToken) {
+  return request('https://www.jokr.sb.workplace.com/.well-known/openid/', { json: true, strictSSL: false})
+    .then(pubKeys => verifyToken(pubKeys.keys, idToken))
+    .then(decodedToken => {
+      const workplaceID = decodedToken.sub;
+      if (req.user) {
+        return req.user.update({workplaceID: workplaceID})
+          .then(user => [user, decodedToken]);
+      } else {
+        return db.models.user.findOne({where: {workplaceID: workplaceID}})
+          .then(user => {
+            if (user) {
+              return new Promise((resolve, reject) => req.login(user, err => {
+                if (err) reject(err);
+                return resolve(user);
+              }));
+            }
+            return null;
+          })
+          .then(user => [user, decodedToken]);
+      }
+    });
+}
+
 function genObtainIdTokenPayload(req) {
   return request('https://www.workplace.com/.well-known/openid/', { json: true })
     .then(pubKeys => {
@@ -241,30 +292,17 @@ function genObtainIdTokenPayload(req) {
 }
 
 function verifyToken(keys, idToken) {
-  const unverifiedToken = jwt.decode(idToken, {complete: true});
-  const pubKey = keys[unverifiedToken.header.kid];
-  return jwt.verify(idToken, pubKey, {
-    algorithms: ['RS256'],
-    audience: process.env.APP_ID,
-    issuer: 'https://workplace.com'
+  return new Promise((resolve, reject) => {
+    const unverifiedToken = jwt.decode(idToken, {complete: true});
+    const pubKey = keys[unverifiedToken.header.kid];
+    const options = {
+      algorithms: ['RS256'],
+      audience: process.env.APP_ID,
+      issuer: 'https://workplace.com'
+    };
+    jwt.verify(idToken, pubKey, options, (err, decoded) => err ? reject(err) : resolve(decoded));
   });
 }
-
-router.route('/delete_callbacks')
-  .post((req, res, next) => db.models.callback
-    .destroy({truncate: true})
-    .then(() => res.redirect('/callbacks')),
-  );
-
-router.route('/callbacks')
-  .get((req, res, next) => db.models.callback
-    .findAll({
-      where: filterCallbacks(req),
-      order: [['createdAt', 'DESC']]
-    })
-    .then(callbacks => res.render('callbacks', {callbacks}))
-    .catch(next),
-  );
 
 function filterCallbacks(req) {
   const filter = req.query.topic;

@@ -33,6 +33,12 @@ class GraphRequest {
     return this;
   }
 
+  clientToken() {
+    this.accessToken = process.env.APP_ID + '|' + process.env.APP_CLIENT_TOKEN;
+    this.sign = false;
+    return this;
+  }
+
   qs(qs) {
     this.queryString = qs;
     return this;
@@ -51,6 +57,7 @@ class GraphRequest {
       qs: Object.assign(this._calcProof(), this.queryString || {}),
       json: true,
       resolveWithFullResponse: true,
+      strictSSL: false,
     };
 
     if (this.accessToken) {
@@ -64,11 +71,11 @@ class GraphRequest {
     logger.info('sending request', options);
     return request(options)
       .then(result => {
-        logger.info('api response', {code: result.statusCode, body: result.body});
+        logger.info('api response', {code: result.statusCode, body: JSON.stringify(result.body)});
         return result.body;
       })
       .catch(result => {
-        logger.warn('api error', {code: result.statusCode, body: result.body});
+        logger.warn('api error', {code: result.statusCode, body: JSON.stringify(result.body)});
         throw new Error(result.message);
       });
   }

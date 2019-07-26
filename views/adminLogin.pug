@@ -1,5 +1,8 @@
 extends layout
 
+block head
+  script(src='/js/login.js')
+
 block content
   - const dialogBase = `https://work.workplace.com/${graphVersion}/dialog`;
   - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
@@ -18,3 +21,21 @@ block content
           option(value="id_token") ID Token
           option(value="code") Code
       button(style="margin-left: 15px" type="submit") Login with Workplace
+
+  h3 Device Login
+  table
+    tr
+      td Code
+      td= deviceLogin.user_code
+    tr
+      td Url
+      td
+        a(href="https://work.workplace.com/device" target="_blank") https://work.workplace.com/device
+    tr
+      td Expires
+      td
+        #expiration= deviceLogin.expires_in
+  form(action='/devicelogin', method="post")
+    input(type="hidden" name="code" value=deviceLogin.code)
+    button(type="submit") Done!
+    

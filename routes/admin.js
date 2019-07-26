@@ -30,13 +30,18 @@ router.route('/')
   );
 
 router.route('/login')
-  .get((req, res, next) => {
-    res.render('adminLogin', {
+  .get((req, res, next) => graph('device/login')
+    .post()
+    .qs({scope: 'openid'})
+    .clientToken()
+    .send()
+    .then(deviceLogin => res.render('adminLogin', {
       appID: process.env.APP_ID,
       graphVersion: process.env.GRAPH_VERSION || 'v3.2',
       redirectURI: process.env.APP_USER_REDIRECT,
-    });
-  });
+      deviceLogin,
+    }))
+  );
 
 router.route('/install')
   .get((req, res, next) => {
