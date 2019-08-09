@@ -221,6 +221,9 @@ router.route('/user_install')
       });
   });
 
+router.route('/android')
+  .get((req, res, next) => res.render('android'));
+
 router.route('/delete_callbacks')
   .post((req, res, next) => db.models.callback
     .destroy({truncate: true})
