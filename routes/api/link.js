@@ -213,7 +213,7 @@ function encodeDoc(link) {
       title: doc.name,
       description: doc.content.toString().substring(0, 200),
       privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-      icon: `${process.env.BASE_URL}taaskly-icon.png`,
+      icon: `${process.env.BASE_URL}/taaskly.png`,
       download_url: `${process.env.BASE_URL}download/${doc.id}/`,
       canonical_link: `${process.env.BASE_URL}document/${doc.id}`,
       type: 'doc',
@@ -282,7 +282,7 @@ function encodeTask(link) {
       privacy: 'organization',
       type: 'task',
       additional_data: additionalData,
-      icon: `${process.env.BASE_URL}taaskly-icon.png`,
+      icon: `${process.env.BASE_URL}/taaskly.png`,
       canonical_link: `${process.env.BASE_URL}task/${task.id}`,
     };
   };
