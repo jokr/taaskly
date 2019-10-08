@@ -276,11 +276,23 @@ function encodeTask(link) {
         },
       );
     }
+
+    const actions = [
+      {
+        value: 'Close',
+        color: 'red',
+        payload: 'Close.Task',
+        disabled: false,
+        type: 'POSTBACK_BUTTON'
+      },
+    ]
+
     return {
       link: link ? link : `${process.env.BASE_URL}/task/${task.id}`,
       title: task.title,
       privacy: 'organization',
       type: 'task',
+      actions: actions,
       additional_data: additionalData,
       icon: `${process.env.BASE_URL}/taaskly.png`,
       canonical_link: `${process.env.BASE_URL}task/${task.id}`,
