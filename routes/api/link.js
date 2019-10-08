@@ -283,7 +283,7 @@ function encodeTask(link) {
         color: 'red',
         payload: 'Close.Task',
         disabled: false,
-        type: 'POSTBACK_BUTTON'
+        type: 'postback_button'
       },
     ]
 
