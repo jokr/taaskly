@@ -61,12 +61,14 @@ function logAndValidateCallback(req, res, next) {
     .create({ path: req.originalUrl, headers: req.headers, body: req.body })
     .then()
     .catch(error => logger.warn(error));
+    /*
   if (!req.xhub) {
     logger.warn('missing x-hub-signature');
     if (validate) {
       throw new BadRequest('Invalid x-hub-signature.');
     }
   }
+  */
   next();
 }
 
