@@ -55,7 +55,7 @@ router.route('/install')
 router.route('/subscribe')
   .post((req, res, next) =>
     Promise.all([
-      webhookSubscribe('link', ['preview', 'collection']),
+      webhookSubscribe('link', ['preview', 'collection', 'postback']),
       webhookSubscribe('page', ['mention']),
     ])
     .then(() => res.redirect('/admin'))
