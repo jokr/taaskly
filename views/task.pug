@@ -9,10 +9,10 @@ block content
     a#cpy Copy link
   if task.completed
     p
-      "Closed"
+      Closed
   else
     p
-      "Open"
+      Open
   if task.priority
     p
       .task(class=`task-${task.priority}`)= task.priority
