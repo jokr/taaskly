@@ -33,6 +33,42 @@ function readChange(body) {
     return body.entry[0].changes[0];
 }
 
+function handlePostback(change) {
+  const {id, type} = extractId(change.link);
+  return db.models.community.findById(parseInt(change.community.id))
+    .then(community => {
+      if (community === null) {
+        throw new BadRequest('Unknown community.');
+      }
+      logger.warn(change.user.id);
+      return db.models.user.findOne({where: {workplaceID: change.user.id}});
+    })
+    .then(user => {
+      logger.warn(user);
+      switch (type) {
+        case 'task':
+          if (user) {
+          return db.models.task
+            .findById(id, {include: [{ model: db.models.user, as: 'owner' }]})
+            .then(task => {
+              if (task === null) {
+                return {data: [], user};
+              }
+              if (change.payload == "Close.Task" && change.value = "Close") {
+                task.completed = true;
+              }
+              const data = encodeTask(change.link)(task);
+              return {data: [data], user};
+            });
+        } else {
+          return {data: [], user};
+        }
+        break;
+      default:
+        throw new BadRequest('Invalid url.');
+  }
+}
+
 function handlePreview(change) {
   const {id, type} = extractId(change.link);
   return db.models.community.findById(parseInt(change.community.id))
@@ -191,6 +227,8 @@ router.route('/callback')
       case 'collection':
         handler = handleCollection(change.value);
         break;
+      case 'postback':
+        handler = handlePostback(change.value)
     }
     if (handler === null) {
       throw new BadRequest('No handler for change.');
