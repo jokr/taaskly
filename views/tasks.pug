@@ -13,6 +13,7 @@ block content
         th Owner
         th Priority
         th Title
+        th Completed
     tbody.link-table
       each task in tasks
         tr
@@ -24,3 +25,5 @@ block content
             .task(class=`task-${task.priority}`)= task.priority
           td
             a(href=`/task/${task.id}`)= task.title
+          td
+           a(href=`/task/${task.id}`)= task.completed
