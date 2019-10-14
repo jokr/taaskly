@@ -7,6 +7,12 @@ block content
   h2= task.title
   div
     a#cpy Copy link
+  if task.completed
+    p
+      "Closed"
+  else
+    p
+      "Open"
   if task.priority
     p
       .task(class=`task-${task.priority}`)= task.priority
