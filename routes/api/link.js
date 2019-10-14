@@ -54,8 +54,13 @@ function handlePostback(change) {
               if (task === null) {
                 return {data: [], user};
               }
-              if (change.payload == "Close.Task" && change.value = "Close") {
+              if (change.payload === "Task.Close") {
                 task.completed = true;
+                task.save().then(function() { logger.info('Task closed.')})
+              }
+              else if (change.payload === "Task.Reopen") {
+                task.completed = false;
+                task.save().then(function() { logger.info('Task reopened.')})
               }
               const data = encodeTask(change.link)(task);
               return {data: [data], user};
@@ -67,6 +72,7 @@ function handlePostback(change) {
       default:
         throw new BadRequest('Invalid url.');
   }
+});
 }
 
 function handlePreview(change) {
@@ -317,10 +323,10 @@ function encodeTask(link) {
 
     const actions = [
       {
-        value: 'Close',
+        value: task.completed ? 'Reopen' : 'Close',
         color: 'red',
-        payload: 'Close.Task',
-        disabled: task.completed,
+        payload: task.completed ? 'Task.Reopen' : 'Task.Close',
+        disabled: false,
         type: 'postback_button'
       },
     ]
