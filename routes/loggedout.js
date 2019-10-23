@@ -187,39 +187,58 @@ router.route('/link_account')
 
 router.route('/user_install')
   .get((req, res, next) => {
-    genObtainIdTokenPayload(req)
-      .then(token => {
-        const workplaceID = token.sub;
-        if (req.user) {
-          req.user
-            .update({workplaceID: workplaceID})
-            .then(() => res.render(
-              'userInstallSuccess',
-              {token, message: 'Linked your Taaskly account with your Workplace account.'}
-            ));
-        } else {
-          const user = db.models.user.findOne({where: {workplaceID: workplaceID}})
-            .then(user => {
-              if (user) {
-                req.login(user, err => {
-                  if (err) {
-                    return res.render(
-                      'userInstallSuccess',
-                      {token, message: 'Obtained id_token, but could not establish session.'}
-                    );
-                  }
-                  return res.render(
-                    'userInstallSuccess',
-                    {token, message: 'Logged you in. You can close this window and refresh the main window.'}
-                  );
-                });
-              } else {
-                return res.render('userInstallSuccess', {token});
-              }
-            });
+    if (req.query.id_token) {
+      return genObtainIdTokenPayload(req.query.id_token);
+    }
+
+    return graph('oauth/access_token')
+      .qs({
+        client_id: process.env.APP_ID,
+        client_secret: process.env.APP_SECRET,
+        redirect_uri: process.env.BASE_URL + 'user_install',
+        code: req.query.code,
+        grant_type: 'authorization_code',
+      })
+      .send()
+      .then(accessTokenResponse => {
+        if (accessTokenResponse.id_token) {
+          return genObtainIdTokenPayload(accessTokenResponse.id_token)
         }
+        return res.render('userInstallSuccess', {token: accessTokenResponse, message: 'Received an access token.'});
       });
   });
+
+function renderIDToken(token) {
+  const workplaceID = token.sub;
+  if (req.user) {
+    req.user
+      .update({workplaceID: workplaceID})
+      .then(() => res.render(
+        'userInstallSuccess',
+        {token, message: 'Linked your Taaskly account with your Workplace account.'}
+      ));
+  } else {
+    const user = db.models.user.findOne({where: {workplaceID: workplaceID}})
+      .then(user => {
+        if (user) {
+          req.login(user, err => {
+            if (err) {
+              return res.render(
+                'userInstallSuccess',
+                {token, message: 'Obtained id_token, but could not establish session.'}
+              );
+            }
+            return res.render(
+              'userInstallSuccess',
+              {token, message: 'Logged you in. You can close this window and refresh the main window.'}
+            );
+          });
+        } else {
+          return res.render('userInstallSuccess', {token});
+        }
+      });
+  }
+}
 
 router.route('/android')
   .get((req, res, next) => res.render('android'));
@@ -284,23 +303,9 @@ function handleIDToken(req, idToken) {
     });
 }
 
-function genObtainIdTokenPayload(req) {
+function genObtainIdTokenPayload(id_token) {
   return request('https://www.workplace.com/.well-known/openid/', { json: true })
-    .then(pubKeys => {
-      if (req.query.id_token) {
-        return verifyToken(pubKeys.keys, req.query.id_token);
-      }
-      return graph('oauth/access_token')
-        .qs({
-          client_id: process.env.APP_ID,
-          client_secret: process.env.APP_SECRET,
-          redirect_uri: process.env.BASE_URL + 'user_install',
-          code: req.query.code,
-          grant_type: 'authorization_code',
-        })
-        .send()
-        .then(accessTokenResponse => verifyToken(pubKeys.keys, accessTokenResponse.id_token));
-    });
+    .then(pubKeys => verifyToken(pubKeys.keys, id_token));
 }
 
 function verifyToken(keys, idToken) {
