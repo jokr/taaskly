@@ -285,7 +285,7 @@ function genObtainIdTokenPayload(req) {
         .qs({
           client_id: process.env.APP_ID,
           client_secret: process.env.APP_SECRET,
-          redirect_uri: process.env.BASE_URL + '/user_install',
+          redirect_uri: process.env.BASE_URL + 'user_install',
           code: req.query.code,
           grant_type: 'authorization_code',
         })
