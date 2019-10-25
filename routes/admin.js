@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const express = require('express');
 const logger = require('heroku-logger');
+const {URL, URLSearchParams} = require('url');
 
 const db = require('../db');
 const graph = require('../graph');
@@ -89,7 +90,15 @@ router.route('/communities')
     )))
     .then(communities => {
       const state = crypto.randomBytes(12).toString('hex');
-      res.render('communities', {communities, state});
+      const installUrl = new URL('https://work.workplace.com//dialog/work/app_install/');
+      const params = new URLSearchParams({
+        "app_id": process.env.APP_ID,
+        "state": state,
+        "redirect_uri": process.env.APP_REDIRECT,
+        "permissions": ['message'],
+      });
+      installUrl.search = params;
+      res.render('communities', {communities, installUrl: installUrl.toString()});
     })
     .catch(next),
   );
