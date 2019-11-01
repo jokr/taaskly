@@ -11,6 +11,11 @@ block content
     p.meta Closed
   else
     p.meta Open
+  if task.subscribers
+    each subscriber in task.subscribers
+      p.meta subscriber.Name
+  else
+    p.meta No subscribers
   if task.priority
     p
       .task(class=`task-${task.priority}`)= task.priority
