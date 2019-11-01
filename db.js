@@ -184,7 +184,7 @@ Document.belongsTo(Folder, { as: 'folder', foreignKey: {allowNull: true }, onDel
 Task.belongsTo(User, { as: 'owner', foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
 User.belongsTo(Community, { as: 'community', foreignKey: { allowNull: true }, onDelete: 'SET NULL'});
 Task.belongsToMany(User, {through: 'Subscription'});
-User.belongsToMany(Task, {as: 'Subscriber', through: 'Subscription'});
+User.belongsToMany(Task, {as: 'Subscribers', through: 'Subscription'});
 
 let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() === 'true';
 let sync = process.env.SYNC_TABLES && process.env.SYNC_TABLES.toLowerCase() === 'true';
