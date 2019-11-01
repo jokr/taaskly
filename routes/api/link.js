@@ -62,6 +62,10 @@ function handlePostback(change) {
                 task.completed = false;
                 task.save().then(function() { logger.info('Task reopened.')})
               }
+              if (change.payload === "Subscribe") {
+                task.addSubscribers(user);
+                task.save().then(function() { logger.info('User subscribed %s', user.username)})
+              }
               const data = encodeTask(change.link)(task);
               return {data: [data], user};
             });
@@ -321,7 +325,7 @@ function encodeTask(link) {
       );
     }
 
-    const actions = [
+    let actions = [
       {
         value: task.completed ? 'Reopen' : 'Close',
         color: 'red',
@@ -330,6 +334,13 @@ function encodeTask(link) {
         type: 'postback_button'
       },
     ]
+    actions.push({
+      value: 'Subscribe',
+      color: 'red',
+      payload: 'Subscribe',
+      disabled: false,
+      type: 'postback_button',
+    });
 
     return {
       link: link ? link : `${process.env.BASE_URL}/task/${task.id}`,
