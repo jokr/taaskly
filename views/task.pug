@@ -11,9 +11,8 @@ block content
     p.meta Closed
   else
     p.meta Open
-  if task.subscribers
-    each subscriber in task.subscribers
-      p.meta subscriber.Name
+  if task.getSubscriber
+    p.meta Some subscribers
   else
     p.meta No subscribers
   if task.priority
