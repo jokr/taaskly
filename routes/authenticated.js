@@ -158,9 +158,13 @@ router.route('/task/create')
   );
 
 router.route('/task/:id')
-  .get((req, res, next) => db.models.task
+  .get(async (req, res, next) => db.models.task
     .findById(req.params.id, {include: [{ model: db.models.user, as: 'owner' }]})
-    .then(task => res.render('task', {task})),
+    .then(async task => {
+      let subscribers= await task.getUsers();
+      res.render('task', {task, subscribers: subscribers})
+    }
+    ).catch(err => logger.warn(err)),
   );
 
 router.route('/link_account_confirm')

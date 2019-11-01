@@ -63,8 +63,15 @@ function handlePostback(change) {
                 task.save().then(function() { logger.info('Task reopened.')})
               }
               if (change.payload === "Subscribe") {
-                task.addSubscribers(user);
-                task.save().then(function() { logger.info('User subscribed %s', user.username)})
+                logger.info(task)
+                logger.info(Object.getOwnPropertyNames(task));
+                task.addUser(user);
+                task.save().then(function() { logger.info(`User subscribed ${user.username}`)});
+                task.getUsers().then(function(value){
+                  if (value) {
+                  logger.info(value[0].username);
+                }
+                })
               }
               const data = encodeTask(change.link)(task);
               return {data: [data], user};

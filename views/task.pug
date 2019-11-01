@@ -11,9 +11,10 @@ block content
     p.meta Closed
   else
     p.meta Open
-  if task.getSubscribers
-    each subscriber in task.getSubscribers
-      p.meta subscriber.username
+  if subscribers.length > 0
+    p Subscribers:
+    each subscriber in subscribers
+      p.meta * #{subscriber.username}
   else
     p.meta No subscribers
   if task.priority
