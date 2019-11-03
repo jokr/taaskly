@@ -33,7 +33,7 @@ function readChange(body) {
     return body.entry[0].changes[0];
 }
 
-function handlePostback(change) {
+async function handlePostback(change) {
   const {id, type} = extractId(change.link);
   return db.models.community.findById(parseInt(change.community.id))
     .then(community => {
@@ -43,14 +43,14 @@ function handlePostback(change) {
       logger.warn(change.user.id);
       return db.models.user.findOne({where: {workplaceID: change.user.id}});
     })
-    .then(user => {
+    .then(async user => {
       logger.warn(user);
       switch (type) {
         case 'task':
           if (user) {
           return db.models.task
             .findById(id, {include: [{ model: db.models.user, as: 'owner' }]})
-            .then(task => {
+            .then(async task => {
               if (task === null) {
                 return {data: [], user};
               }
@@ -73,7 +73,7 @@ function handlePostback(change) {
                 }
                 })
               }
-              const data = encodeTask(change.link)(task);
+              const data = await encodeTask(change.link, user)(task);
               return {data: [data], user};
             });
         } else {
@@ -86,7 +86,7 @@ function handlePostback(change) {
 });
 }
 
-function handlePreview(change) {
+async function handlePreview(change) {
   const {id, type} = extractId(change.link);
   return db.models.community.findById(parseInt(change.community.id))
     .then(community => {
@@ -145,11 +145,11 @@ function handlePreview(change) {
           if (user) {
             return db.models.task
               .findById(id, {include: [{ model: db.models.user, as: 'owner' }]})
-              .then(task => {
+              .then(async task => {
                 if (task === null) {
                   return {data: [], user};
                 }
-                const data = encodeTask(change.link)(task);
+                const data = await encodeTask(change.link, user)(task);
                 return {data: [data], user};
               });
           } else {
@@ -229,7 +229,7 @@ function handleCollection(change) {
 }
 
 router.route('/callback')
-  .post((req, res, next) => {
+  .post(async (req, res, next) => {
     if (req.body.object !== 'link') {
       logger.warn('Received invalid link webhook', req.body);
       throw new BadRequest('Invalid topic.');
@@ -239,13 +239,13 @@ router.route('/callback')
     let handler = null;
     switch (change.field) {
       case 'preview':
-        handler = handlePreview(change.value);
+        handler = await handlePreview(change.value);
         break;
       case 'collection':
         handler = handleCollection(change.value);
         break;
       case 'postback':
-        handler = handlePostback(change.value)
+        handler = await handlePostback(change.value)
     }
     if (handler === null) {
       throw new BadRequest('No handler for change.');
@@ -288,7 +288,7 @@ function encodeFolder(link) {
   };
 }
 
-function encodeTask(link) {
+async function encodeTask(link, user) {
   return function(task) {
     const additionalData = [];
     if (task.owner.workplaceID) {
