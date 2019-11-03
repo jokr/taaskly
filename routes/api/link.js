@@ -73,7 +73,7 @@ async function handlePostback(change) {
                 }
                 })
               }
-              const data = await encodeTask(change.link, user)(task);
+              const data = await encodeTask(change.link, user, task);
               return {data: [data], user};
             });
         } else {
@@ -149,7 +149,7 @@ async function handlePreview(change) {
                 if (task === null) {
                   return {data: [], user};
                 }
-                const data = await encodeTask(change.link, user)(task);
+                const data = await encodeTask(change.link, user, task);
                 return {data: [data], user};
               });
           } else {
@@ -239,13 +239,13 @@ router.route('/callback')
     let handler = null;
     switch (change.field) {
       case 'preview':
-        handler = await handlePreview(change.value);
+        handler = handlePreview(change.value);
         break;
       case 'collection':
         handler = handleCollection(change.value);
         break;
       case 'postback':
-        handler = await handlePostback(change.value)
+        handler = handlePostback(change.value)
     }
     if (handler === null) {
       throw new BadRequest('No handler for change.');
@@ -256,7 +256,7 @@ router.route('/callback')
           .status(200)
           .json({data: response.data, linked_user: response.user !== null});
       })
-      .catch(next);
+      .catch(err => logger.warn(err));
   });
 
 module.exports = router;
@@ -288,8 +288,7 @@ function encodeFolder(link) {
   };
 }
 
-async function encodeTask(link, user) {
-  return function(task) {
+async function encodeTask(link, user, task) {
     const additionalData = [];
     if (task.owner.workplaceID) {
       additionalData.push(
@@ -341,14 +340,25 @@ async function encodeTask(link, user) {
         type: 'postback_button'
       },
     ]
-    actions.push({
-      value: 'Subscribe',
-      color: 'red',
-      payload: 'Subscribe',
-      disabled: false,
-      type: 'postback_button',
-    });
-
+    let subscribers = await task.getUsers();
+    if (subscribers.map((sub => sub.workplaceID)).includes(user.workplaceID)) {
+      actions.push({
+        value: 'Unsubscribe',
+        color: 'red',
+        payload: 'Unsubscribe',
+        disabled: false,
+        type: 'postback_button',
+      });
+    }
+    else {
+      actions.push({
+        value: 'Subscribe',
+        color: 'red',
+        payload: 'Subscribe',
+        disabled: false,
+        type: 'postback_button',
+      });
+    }
     return {
       link: link ? link : `${process.env.BASE_URL}/task/${task.id}`,
       title: task.title,
@@ -359,5 +369,4 @@ async function encodeTask(link, user) {
       icon: `${process.env.BASE_URL}/taaskly.png`,
       canonical_link: `${process.env.BASE_URL}task/${task.id}`,
     };
-  };
 }

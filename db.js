@@ -189,7 +189,7 @@ User.belongsToMany(Task, {through: 'TaskUser'});
 let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() === 'true';
 let sync = process.env.SYNC_TABLES && process.env.SYNC_TABLES.toLowerCase() === 'true';
 
-sequelize.sync();
+// sequelize.sync();
 if (sync || force) {
   Promise.all([Community.sync({force}), Callback.sync({force}), Page.sync({force})])
     .then(() => User.sync({force}))
