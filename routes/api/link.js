@@ -62,16 +62,13 @@ async function handlePostback(change) {
                 task.completed = false;
                 task.save().then(function() { logger.info('Task reopened.')})
               }
-              if (change.payload === "Subscribe") {
-                logger.info(task)
-                logger.info(Object.getOwnPropertyNames(task));
-                task.addUser(user);
+              else if (change.payload === "Subscribe") {
+                await task.addUser(user);
                 task.save().then(function() { logger.info(`User subscribed ${user.username}`)});
-                task.getUsers().then(function(value){
-                  if (value) {
-                  logger.info(value[0].username);
-                }
-                })
+              }
+              else if (change.payload === "Unsubscribe") {
+                await task.removeUser(user);
+                task.save().then(function() { logger.info(`User unsubscribed ${user.username}`)});
               }
               const data = await encodeTask(change.link, user, task);
               return {data: [data], user};
@@ -341,6 +338,8 @@ async function encodeTask(link, user, task) {
       },
     ]
     let subscribers = await task.getUsers();
+    logger.warn(JSON.stringify(subscribers));
+    logger.warn(JSON.stringify(user));
     if (subscribers.map((sub => sub.workplaceID)).includes(user.workplaceID)) {
       actions.push({
         value: 'Unsubscribe',
