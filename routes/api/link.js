@@ -361,7 +361,7 @@ async function encodeTask(link, user, task) {
     return {
       link: link ? link : `${process.env.BASE_URL}/task/${task.id}`,
       title: task.title,
-      privacy: 'personalized',
+      privacy: 'organization',
       type: 'task',
       actions: actions,
       additional_data: additionalData,
