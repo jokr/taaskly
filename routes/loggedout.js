@@ -188,27 +188,69 @@ router.route('/link_account')
 router.route('/user_install')
   .get((req, res, next) => {
     if (req.query.id_token) {
-      return genObtainIdTokenPayload(req.query.id_token);
+      genObtainIdTokenPayload(req.query.id_token)
+        .then(token => handleIDToken(token, req, res));
+      return;
     }
 
-    return graph('oauth/access_token')
+    if (req.query.code) {
+      graph('oauth/access_token')
+        .qs({
+          client_id: process.env.APP_ID,
+          client_secret: process.env.APP_SECRET,
+          redirect_uri: process.env.APP_USER_REDIRECT,
+          code: req.query.code,
+          grant_type: 'authorization_code',
+        })
+        .send()
+        .then(accessTokenResponse => {
+          if (accessTokenResponse.id_token) {
+            genObtainIdTokenPayload(accessTokenResponse.id_token)
+              .then(tokenPayload => res.render('userInstallSuccess', {token: tokenPayload, message: 'Received an id token after code exchange.'}));
+          }
+          return res.render('userInstallSuccess', {token: accessTokenResponse, message: 'Received an access token.'});
+        });
+      return;
+    }
+
+    return res.render('clienttoken');
+  });
+
+router.route('/login_with_access_token')
+  .post((req, res, next) => {
+    if (!req.body.token) {
+      return res
+        .status(400)
+        .send();
+    }
+    graph('/me')
+      .token(req.body.token)
       .qs({
-        client_id: process.env.APP_ID,
-        client_secret: process.env.APP_SECRET,
-        redirect_uri: process.env.BASE_URL + 'user_install',
-        code: req.query.code,
-        grant_type: 'authorization_code',
+        fields: 'id,name,email,community{id,name}',
       })
       .send()
-      .then(accessTokenResponse => {
-        if (accessTokenResponse.id_token) {
-          return genObtainIdTokenPayload(accessTokenResponse.id_token)
-        }
-        return res.render('userInstallSuccess', {token: accessTokenResponse, message: 'Received an access token.'});
+      .then(response => {
+        db.models.user.findOrCreate({
+          where: {workplaceID: response.id},
+          defaults: {username: response.email},
+        })
+          .then(([user, created]) => {
+            req.login(user, err => {
+              if (err) {
+                logger.error(err);
+                return res
+                  .status(500)
+                  .send();
+              }
+              res
+                .status(200)
+                .send();
+            });
+          });
       });
   });
 
-function renderIDToken(token) {
+function handleIDToken(token, req, res) {
   const workplaceID = token.sub;
   if (req.user) {
     req.user
