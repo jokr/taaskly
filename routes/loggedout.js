@@ -240,16 +240,25 @@ router.route('/callbacks')
     .catch(next),
   );
 
-router.route('/devicelogin')
-  .post((req, res, next) => graph('device/login_status')
-    .post()
-    .clientToken()
-    .qs({code: req.body.code})
-    .send()
-    .then(response => handleIDToken(req, response.id_token))
-    .then(() => res.redirect('/documents'))
-    .catch(next)
-  );
+router.route('/device')
+  .get((req, res, next) => {
+    graph('device/login')
+      .post()
+      .clientToken()
+      .send()
+      .then(deviceLogin => res.render('deviceLogin', {deviceLogin}))
+  })
+  .post((req, res, next) => {
+    graph('device/login_status')
+      .post()
+      .clientToken()
+      .qs({code: req.body.code})
+      .send()
+      .then(response => {
+        console.log(response);
+        res.render('debug', {details: response});
+      });
+  });
 
 function handleIDToken(req, idToken) {
   return request('https://www.jokr.sb.workplace.com/.well-known/openid/', { json: true, strictSSL: false})

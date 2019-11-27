@@ -1,0 +1,23 @@
+extends layout
+
+block head
+  script(src='/js/login.js')
+
+block content
+  h2 Device Login
+  table
+    tr
+      td Code
+      td= deviceLogin.user_code
+    tr
+      td Url
+      td
+        a(href="https://www.workplace.com/device" target="_blank") https://www.workplace.com/device
+    tr
+      td Expires
+      td
+        #expiration= deviceLogin.expires_in
+  form(action='/device', method="post")
+    input(type="hidden" name="code" value=deviceLogin.code)
+    button(type="submit") Done!
+
