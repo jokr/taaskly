@@ -250,6 +250,37 @@ router.route('/login_with_access_token')
       });
   });
 
+router.route('/login_with_id_token')
+  .post((req, res, next) => {
+    if (!req.body.token) {
+      return res
+        .status(400)
+        .send();
+    }
+    genObtainIdTokenPayload(req.body.token)
+      .then(payload => {
+        db.models.user.findOne({where: {workplaceID: payload.sub}})
+          .then(user => {
+            if (!user) {
+              return res
+                .status(500)
+                .send();
+            }
+            req.login(user, err => {
+              if (err) {
+                logger.error(err);
+                return res
+                  .status(500)
+                  .send();
+              }
+              res
+                .status(200)
+                .send();
+            });
+          });
+      });
+  });
+
 function handleIDToken(token, req, res) {
   const workplaceID = token.sub;
   if (req.user) {
@@ -346,7 +377,10 @@ function handleIDToken(req, idToken) {
 }
 
 function genObtainIdTokenPayload(id_token) {
-  return request('https://www.workplace.com/.well-known/openid/', { json: true })
+  return request(
+    'https://www.workplace.com/.well-known/openid/',
+    { json: true },
+  )
     .then(pubKeys => verifyToken(pubKeys.keys, id_token));
 }
 
@@ -359,7 +393,20 @@ function verifyToken(keys, idToken) {
       audience: process.env.APP_ID,
       issuer: 'https://workplace.com'
     };
-    jwt.verify(idToken, pubKey, options, (err, decoded) => err ? reject(err) : resolve(decoded));
+    jwt.verify(
+      idToken,
+      pubKey,
+      options,
+      (err, decoded) => {
+        if (err) {
+          logger.error(err);
+          return reject(err);
+        } else {
+          logger.info(JSON.stringify(decoded));
+          return resolve(decoded);
+        }
+      },
+    );
   });
 }
 

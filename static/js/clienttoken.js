@@ -18,4 +18,15 @@ if (dataMap.has('access_token')) {
   .then(() => {
     opener.postMessage('login', '*');
   });
+} else if (dataMap.has('id_token')) {
+  const formData = new FormData();
+  const opener = window.opener;
+  formData.append('token', dataMap.get('id_token'));
+  fetch('/login_with_id_token', {
+    method: 'POST',
+    body: new URLSearchParams(formData),
+  })
+  .then(() => {
+    opener.postMessage('login', '*');
+  });
 }

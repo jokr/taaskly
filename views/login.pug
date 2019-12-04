@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  - const dialog = `https://taaskly.m.jokr.sb.workplace.com/${graphVersion}/dialog/oauth`;
+  - const dialog = `https://work-m.workplace.com/${graphVersion}/dialog/oauth`;
   - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
   - const onsubmit = `window.open('', 'wp', '${dialogFeatures}'); this.target = 'wp'`;
   h2 Login
@@ -11,7 +11,7 @@ block content
         form(action=dialog method="get" onsubmit=onsubmit)
           input(type="hidden", name="app_id", value=appID)
           input(type="hidden", name="redirect_uri", value=userRedirectURI)
-          input(type="hidden", name="scope", value="openid")
+          input(type="hidden", name="scope", value="openid,email")
           input(type="hidden", name="response_type", value="id_token")
           button(type="submit") Login with Workplace (OpenID)
         form(action=dialog method="get" onsubmit=onsubmit)
