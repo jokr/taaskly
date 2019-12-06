@@ -4,7 +4,8 @@ const crypto = require('crypto');
 const logger = require('heroku-logger')
 const request = require('request-promise-native');
 
-const baseURL = 'https://graph.jokr.sb.workplace.com';
+const workplaceBase = process.env.WORKPLACE_BASE || 'workplace.com';
+const baseURL = `https://graph.${workplaceBase}`;
 
 class GraphRequest {
   constructor(path) {

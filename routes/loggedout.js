@@ -15,6 +15,8 @@ const graph = require('../graph');
 
 const router = express.Router();
 
+const workplaceBase = process.env.WORKPLACE_BASE || 'workplace.com';
+
 router.route('/')
   .get((req, res, next) => res.render('home'));
 
@@ -22,6 +24,7 @@ router.route('/login')
   .get((req, res, next) => res.render('login', {
     appID: process.env.APP_ID,
     graphVersion: process.env.GRAPH_VERSION || 'v3.2',
+    workplaceBase: workplaceBase,
     redirectURI: process.env.APP_REDIRECT,
     userRedirectURI: process.env.APP_USER_REDIRECT,
   }))
@@ -187,12 +190,6 @@ router.route('/link_account')
 
 router.route('/user_install')
   .get((req, res, next) => {
-    if (req.query.id_token) {
-      genObtainIdTokenPayload(req.query.id_token)
-        .then(token => handleIDToken(token, req, res));
-      return;
-    }
-
     if (req.query.code) {
       graph('oauth/access_token')
         .qs({
@@ -353,7 +350,7 @@ router.route('/device')
   });
 
 function handleIDToken(req, idToken) {
-  return request('https://www.jokr.sb.workplace.com/.well-known/openid/', { json: true, strictSSL: false})
+  return request(`https://www.${workplaceBase}/.well-known/openid/`, { json: true, strictSSL: false})
     .then(pubKeys => verifyToken(pubKeys.keys, idToken))
     .then(decodedToken => {
       const workplaceID = decodedToken.sub;

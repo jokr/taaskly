@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  - const dialog = `https://work-m.workplace.com/${graphVersion}/dialog/oauth`;
+  - const dialog = `https://work-m.${workplaceBase}/${graphVersion}/dialog/oauth`;
   - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
   - const onsubmit = `window.open('', 'wp', '${dialogFeatures}'); this.target = 'wp'`;
   h2 Login
