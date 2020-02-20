@@ -183,10 +183,13 @@ Document.belongsTo(User, { as: 'owner',  foreignKey: { allowNull: false }, onDel
 Document.belongsTo(Folder, { as: 'folder', foreignKey: {allowNull: true }, onDelete: 'CASCADE' });
 Task.belongsTo(User, { as: 'owner', foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
 User.belongsTo(Community, { as: 'community', foreignKey: { allowNull: true }, onDelete: 'SET NULL'});
+Task.belongsToMany(User, { through: 'TaskUser'});
+User.belongsToMany(Task, {through: 'TaskUser'});
 
 let force = process.env.DROP_TABLES && process.env.DROP_TABLES.toLowerCase() === 'true';
 let sync = process.env.SYNC_TABLES && process.env.SYNC_TABLES.toLowerCase() === 'true';
 
+// sequelize.sync();
 if (sync || force) {
   Promise.all([Community.sync({force}), Callback.sync({force}), Page.sync({force})])
     .then(() => User.sync({force}))

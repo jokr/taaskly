@@ -7,6 +7,16 @@ block content
   h2= task.title
   div
     a#cpy Copy link
+  if task.completed
+    p.meta Closed
+  else
+    p.meta Open
+  if subscribers.length > 0
+    p Subscribers:
+    each subscriber in subscribers
+      p.meta * #{subscriber.username}
+  else
+    p.meta No subscribers
   if task.priority
     p
       .task(class=`task-${task.priority}`)= task.priority

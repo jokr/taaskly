@@ -33,7 +33,57 @@ function readChange(body) {
     return body.entry[0].changes[0];
 }
 
-function handlePreview(change) {
+async function handlePostback(change) {
+  const {id, type} = extractId(change.link);
+  return db.models.community.findById(parseInt(change.community.id))
+    .then(community => {
+      if (community === null) {
+        throw new BadRequest('Unknown community.');
+      }
+      logger.warn(change.user.id);
+      return db.models.user.findOne({where: {workplaceID: change.user.id}});
+    })
+    .then(async user => {
+      logger.warn(user);
+      switch (type) {
+        case 'task':
+          if (user) {
+          return db.models.task
+            .findById(id, {include: [{ model: db.models.user, as: 'owner' }]})
+            .then(async task => {
+              if (task === null) {
+                return {data: [], user};
+              }
+              if (change.payload === "Task.Close") {
+                task.completed = true;
+                task.save().then(function() { logger.info('Task closed.')})
+              }
+              else if (change.payload === "Task.Reopen") {
+                task.completed = false;
+                task.save().then(function() { logger.info('Task reopened.')})
+              }
+              else if (change.payload === "Subscribe") {
+                await task.addUser(user);
+                task.save().then(function() { logger.info(`User subscribed ${user.username}`)});
+              }
+              else if (change.payload === "Unsubscribe") {
+                await task.removeUser(user);
+                task.save().then(function() { logger.info(`User unsubscribed ${user.username}`)});
+              }
+              const data = await encodeTask(change.link, user, task);
+              return {data: [data], user};
+            });
+        } else {
+          return {data: [], user};
+        }
+        break;
+      default:
+        throw new BadRequest('Invalid url.');
+  }
+});
+}
+
+async function handlePreview(change) {
   const {id, type} = extractId(change.link);
   return db.models.community.findById(parseInt(change.community.id))
     .then(community => {
@@ -92,11 +142,11 @@ function handlePreview(change) {
           if (user) {
             return db.models.task
               .findById(id, {include: [{ model: db.models.user, as: 'owner' }]})
-              .then(task => {
+              .then(async task => {
                 if (task === null) {
                   return {data: [], user};
                 }
-                const data = encodeTask(change.link)(task);
+                const data = await encodeTask(change.link, user, task);
                 return {data: [data], user};
               });
           } else {
@@ -176,7 +226,7 @@ function handleCollection(change) {
 }
 
 router.route('/callback')
-  .post((req, res, next) => {
+  .post(async (req, res, next) => {
     if (req.body.object !== 'link') {
       logger.warn('Received invalid link webhook', req.body);
       throw new BadRequest('Invalid topic.');
@@ -191,6 +241,8 @@ router.route('/callback')
       case 'collection':
         handler = handleCollection(change.value);
         break;
+      case 'postback':
+        handler = handlePostback(change.value)
     }
     if (handler === null) {
       throw new BadRequest('No handler for change.');
@@ -201,7 +253,7 @@ router.route('/callback')
           .status(200)
           .json({data: response.data, linked_user: response.user !== null});
       })
-      .catch(next);
+      .catch(err => logger.warn(err));
   });
 
 module.exports = router;
@@ -213,7 +265,7 @@ function encodeDoc(link) {
       title: doc.name,
       description: doc.content.toString().substring(0, 200),
       privacy: doc.privacy === 'public' ? 'organization' : 'accessible',
-      icon: `${process.env.BASE_URL}taaskly-icon.png`,
+      icon: `${process.env.BASE_URL}/taaskly.png`,
       download_url: `${process.env.BASE_URL}download/${doc.id}/`,
       canonical_link: `${process.env.BASE_URL}document/${doc.id}`,
       type: 'doc',
@@ -233,8 +285,7 @@ function encodeFolder(link) {
   };
 }
 
-function encodeTask(link) {
-  return function(task) {
+async function encodeTask(link, user, task) {
     const additionalData = [];
     if (task.owner.workplaceID) {
       additionalData.push(
@@ -276,14 +327,45 @@ function encodeTask(link) {
         },
       );
     }
+
+    let actions = [
+      {
+        value: task.completed ? 'Reopen' : 'Close',
+        color: 'red',
+        payload: task.completed ? 'Task.Reopen' : 'Task.Close',
+        disabled: false,
+        type: 'postback_button'
+      },
+    ]
+    let subscribers = await task.getUsers();
+    logger.warn(JSON.stringify(subscribers));
+    logger.warn(JSON.stringify(user));
+    if (subscribers.map((sub => sub.workplaceID)).includes(user.workplaceID)) {
+      actions.push({
+        value: 'Unsubscribe',
+        color: 'red',
+        payload: 'Unsubscribe',
+        disabled: false,
+        type: 'postback_button',
+      });
+    }
+    else {
+      actions.push({
+        value: 'Subscribe',
+        color: 'red',
+        payload: 'Subscribe',
+        disabled: false,
+        type: 'postback_button',
+      });
+    }
     return {
       link: link ? link : `${process.env.BASE_URL}/task/${task.id}`,
       title: task.title,
-      privacy: 'organization',
+      privacy: 'personalized',
       type: 'task',
+      actions: actions,
       additional_data: additionalData,
-      icon: `${process.env.BASE_URL}taaskly-icon.png`,
+      icon: `${process.env.BASE_URL}/taaskly.png`,
       canonical_link: `${process.env.BASE_URL}task/${task.id}`,
     };
-  };
 }
