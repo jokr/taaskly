@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  h2 Webhook Subscriptions
+
+  if subscriptions.length === 0
+    p No active webhook subscriptions.
+  else
+    table
+      thead
+        tr
+          th Topic
+          th Fields
+          th Callback URL
+      tbody
+      each subscription in subscriptions
+        tr
+          td= subscription.object
+          td= subscription.fields.map(f => f.name).join(', ')
+          td= subscription.callback_url
+
+    div(style="margin-top: 12px")
+      form(action="/admin/subscribe" method="post")
+        div(style="display: flex")
+          label(style="margin-right: 12px")
+            .label Topic
+            input(type="text" name="topic")
+          label
+            .label Field
+            input(type="text" name="field")
+        button(type="submit" style="margin-top: 8px") Subscribe

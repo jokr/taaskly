@@ -70,7 +70,7 @@ form.small {
 }
 
 input[type=text], input[type=password], textarea  {
-  margin-top: 2px;
+  margin: 2px 0;
   width: 100%;
   padding: 8px;
 }

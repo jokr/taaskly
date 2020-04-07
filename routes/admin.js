@@ -17,16 +17,19 @@ router.use((req, res, next) => {
     {name: 'Callbacks', path: '/callbacks'},
     {name: 'Install', path: '/admin/install'},
     {name: 'Login', path: '/admin/login'},
-    {name: 'Subscriptions', path: '/admin/'}
+    {name: 'Subscriptions', path: '/admin/subscriptions'},
   ];
   next();
 });
 
 router.route('/')
+  .get((req, res, next) => res.redirect('/admin/subscriptions'))
+
+router.route('/subscriptions')
   .get((req, res, next) => graph('app/subscriptions')
     .appSecret()
     .send()
-    .then(subscriptions => res.render('admin', {subscriptions: subscriptions.data}))
+    .then(subscriptions => res.render('subscriptions', {subscriptions: subscriptions.data}))
     .catch(next)
   );
 
@@ -40,13 +43,21 @@ router.route('/install')
   });
 
 router.route('/subscribe')
-  .post((req, res, next) =>
-    Promise.all([
-      webhookSubscribe('link', ['preview', 'collection']),
-      webhookSubscribe('page', ['mention']),
-    ])
-    .then(() => res.redirect('/admin'))
-    .catch(next),
+  .post((req, res, next) => {
+      const {topic, field} = req.body;
+      let request = null;
+      if (topic && field) {
+        request = webhookSubscribe(topic, [field]);
+      } else {
+        request = Promise.all([
+          webhookSubscribe('link', ['preview', 'collection']),
+          webhookSubscribe('page', ['mention']),
+        ]);
+      }
+      return request
+        .then(() => res.redirect('/admin'))
+        .catch(next);
+    },
   );
 
 router.route('/installs')
