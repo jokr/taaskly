@@ -46,20 +46,6 @@ router.use((req, res, next) => {
   next();
 });
 
-router.use((req, res, next) => {
-  const navigation = [];
-  if (req.user) {
-    navigation.push({name: 'Documents', path: '/documents'});
-    navigation.push({name: 'Folders', path: '/folders'});
-    navigation.push({name: 'Tasks', path: '/tasks'});
-    if (req.isAdmin) {
-      navigation.push({name: 'Admin', path: '/admin'});
-    }
-  }
-  res.locals.navigation = navigation;
-  next();
-});
-
 router.route('/download/:id')
   .get((req, res, next) => db.models.document.findById(
       req.params.id, {

@@ -9,6 +9,19 @@ const graph = require.main.require('./graph');
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+  const navigation = [
+    {name: 'Documents', path: '/documents'},
+    {name: 'Folders', path: '/folders'},
+    {name: 'Tasks', path: '/tasks'},
+  ];
+  if (req.isAdmin) {
+    navigation.push({name: 'Admin', path: '/admin'});
+  }
+  res.locals.navigation = navigation;
+  next();
+});
+
 router.route('/logout')
   .get((req, res, next) => {
     req.logout();
