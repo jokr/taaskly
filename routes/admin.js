@@ -18,6 +18,7 @@ router.use((req, res, next) => {
     {name: 'Install', path: '/admin/install'},
     {name: 'Login', path: '/admin/login'},
     {name: 'Subscriptions', path: '/admin/subscriptions'},
+    {name: 'Chat', path: '/admin/chat'},
   ];
   next();
 });
@@ -119,6 +120,25 @@ router.route('/user/:id/delete')
     .destroy({ where: {id: req.params.id}})
     .then(() => res.redirect('/admin/users'))
     .catch(next),
+  );
+
+router.route('/chat/')
+  .get((req, res, next) => db.models.install
+    .findAll()
+    .then(installs => {
+      const ref = Math.random().toString(36).slice(4);
+      for (const install of installs) {
+        const deeplink = new URL(`https://w.jokr.sb.m.me/${install.pageId}`);
+        install.prettylink = deeplink.toString();
+        const params = new URLSearchParams({
+          "ref": ref,
+        });
+        deeplink.search = params;
+        install.deeplink = deeplink.toString();
+      }
+      res.render('chat', {installs, ref: ref});
+    })
+    .catch(next)
   );
 
 function webhookSubscribe(topic, fields) {

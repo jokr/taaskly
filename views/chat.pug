@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h2 Chat
+  p Ref parameter
+    code(style="margin-left: 12px")= ref
+  table.communities
+    thead
+      tr
+        th(style="width: 200px") Page ID
+        th Page Name
+        th Link
+    tbody
+      each install in installs
+        tr
+          td= install.pageId
+          td= install.name
+          td
+            a(href=install.deeplink target="_blank")= install.prettylink
