@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  h2 All Installs
+  .community-actions
+    - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
+    - const onclick = `window.open('${installUrl}', 'wp', '${dialogFeatures}')`;
+    a.button(onclick=onclick) Install
+  table.communities
+    thead
+      tr
+        th(style="width: 200px") Community ID
+        th Community Name
+        th(style="width: 200px") Page ID
+        th Page Name
+        th Created Time
+        th Install Type
+        th Permissions
+    tbody
+      each install in installs
+        tr
+          td= install.community.id
+          td= install.community.name
+          td= install.pageId
+          td= install.name
+          td= moment(install.createdAt).fromNow()
+          td= install.installType.toLowerCase()
+          td= install.permissions.join(', ').toLowerCase()

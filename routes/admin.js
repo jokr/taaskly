@@ -13,7 +13,7 @@ const router = express.Router();
 router.use((req, res, next) => {
   res.locals.navigation = [
     {name: 'Users', path: '/admin/users'},
-    {name: 'Communities', path: '/admin/communities'},
+    {name: 'Installs', path: '/admin/installs'},
     {name: 'Callbacks', path: '/callbacks'},
     {name: 'Install', path: '/admin/install'},
     {name: 'Login', path: '/admin/login'},
@@ -49,32 +49,32 @@ router.route('/subscribe')
     .catch(next),
   );
 
-router.route('/communities')
-  .get((req, res, next) => db.models.community
-    .findAll({order: [['name', 'ASC']]})
-    .then(communities => {
+router.route('/installs')
+  .get((req, res, next) => db.models.install
+    .findAll({include: [{model: db.models.community, as: 'community'}]})
+    .then(installs => {
       if (process.env.APP_ID && process.env.ACCESS_TOKEN) {
         return [{
           id: process.env.APP_ID,
           name: 'Custom Integration',
           accessToken: process.env.ACCESS_TOKEN,
-        }].concat(communities);
+        }].concat(installs);
       }
-      return communities;
+      return installs;
     })
-    .then(communities => Promise.all(
-      communities.map(community =>
+    .then(installs => Promise.all(
+      installs.map(install =>
         graph('community')
           .qs({fields: 'id,install'})
-          .token(community.accessToken)
+          .token(install.accessToken)
           .send()
           .then(response => {
-            community.permissions = response.install.permissions;
-            community.installType = response.install.install_type;
-            return community;
+            install.permissions = response.install.permissions;
+            install.installType = response.install.install_type;
+            return install;
           }),
     )))
-    .then(communities => {
+    .then(installs => {
       const state = crypto.randomBytes(12).toString('hex');
       const installUrl = new URL('https://work.workplace.com//dialog/work/app_install/');
       const params = new URLSearchParams({
@@ -84,7 +84,7 @@ router.route('/communities')
         "permissions": ['message'],
       });
       installUrl.search = params;
-      res.render('communities', {communities, installUrl: installUrl.toString()});
+      res.render('installs', {installs, installUrl: installUrl.toString()});
     })
     .catch(next),
   );

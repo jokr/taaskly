@@ -1,7 +1,8 @@
 extends layout
 
 block head
-  meta(http-equiv="refresh" content="3;url="+redirect)
+  if redirect
+    meta(http-equiv="refresh" content="3;url="+redirect)
     
 block navigation
 
@@ -14,6 +15,8 @@ block content
     pre= state
   else
     p No state param has been passed.
-  p This site will redirect back to Workplace in 3 seconds:
-  pre= redirect
-    
+  if redirect
+    p This site will redirect back to Workplace in 3 seconds:
+    pre= redirect
+  else
+    p You can now close this window.

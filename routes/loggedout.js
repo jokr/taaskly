@@ -122,30 +122,36 @@ router.route('/community_install')
       })
       .send()
       .then(tokenResponse => {
-        return graph('community')
-          .token(tokenResponse.access_token)
-          .qs({ fields: 'name' })
-          .send()
-          .then(communityResponse => db.models.community
-            .findById(communityResponse.id)
-            .then(community => {
-              if (community) {
-                return community.update({accessToken: tokenResponse.access_token});
-              } else {
-                return db.models.community.create({
-                  id: communityResponse.id,
-                  name: communityResponse.name,
-                  accessToken: tokenResponse.access_token,
-                });
-              }
-            })
-          );
-      })
-      .then(community => {
-        const redirect = req.query.redirect_uri;
-        const state = req.query.state;
-        res.render('installSuccess', {community, state, redirect});
-      })
+        return Promise.all([
+            graph('community')
+              .token(tokenResponse.access_token)
+              .qs({ fields: 'name' })
+              .send(),
+            graph('me')
+              .token(tokenResponse.access_token)
+              .qs({ fields: 'id,name' })
+              .send(),
+          ]).then(graphResponse => {
+            const [communityResponse, pageResponse] = graphResponse;
+            db.models.community
+              .findOrCreate({where: {id: communityResponse.id}, defaults: {name: communityResponse.name}})
+              .then(communityMutation => {
+                const [community, created] = communityMutation;
+                db.models.install.create({
+                    pageId: pageResponse.id,
+                    communityId: community.id,
+                    name: pageResponse.name,
+                    accessToken: tokenResponse.access_token,
+                  })
+                  .then(() => {
+                    const redirect = req.query.redirect_uri;
+                    const state = req.query.state;
+                    res.render('installSuccess', {community, state, redirect});
+                  });
+              });
+          })
+        })
+
       .catch(next);
   });
 
