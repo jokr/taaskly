@@ -84,7 +84,8 @@ router.route('/installs')
             install.permissions = response.install.permissions;
             install.installType = response.install.install_type;
             return install;
-          }),
+          })
+          .catch(() => install),
     )))
     .then(installs => {
       const state = crypto.randomBytes(12).toString('hex');
