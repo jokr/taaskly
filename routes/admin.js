@@ -15,7 +15,6 @@ router.use((req, res, next) => {
     {name: 'Users', path: '/admin/users'},
     {name: 'Installs', path: '/admin/installs'},
     {name: 'Callbacks', path: '/callbacks'},
-    {name: 'Install', path: '/admin/install'},
     {name: 'Login', path: '/admin/login'},
     {name: 'Subscriptions', path: '/admin/subscriptions'},
     {name: 'Chat', path: '/admin/chat'},
@@ -33,15 +32,6 @@ router.route('/subscriptions')
     .then(subscriptions => res.render('subscriptions', {subscriptions: subscriptions.data}))
     .catch(next)
   );
-
-router.route('/install')
-  .get((req, res, next) => {
-    res.render('adminInstall', {
-      appID: process.env.APP_ID,
-      graphVersion: process.env.GRAPH_VERSION || 'v3.2',
-      redirectURI: process.env.APP_USER_REDIRECT,
-    });
-  });
 
 router.route('/subscribe')
   .post((req, res, next) => {
@@ -89,15 +79,13 @@ router.route('/installs')
     )))
     .then(installs => {
       const state = crypto.randomBytes(12).toString('hex');
-      const installUrl = new URL('https://work.workplace.com//dialog/work/app_install/');
-      const params = new URLSearchParams({
-        "app_id": process.env.APP_ID,
-        "state": state,
-        "redirect_uri": process.env.APP_REDIRECT,
-        "permissions": ['message'],
-      });
-      installUrl.search = params;
-      res.render('installs', {installs, installUrl: installUrl.toString()});
+      const installUrl = 'https://work.workplace.com/dialog/work/app_install/';
+      const installParams = {
+        app_id: process.env.APP_ID,
+        state: state,
+        redirect_uri: process.env.APP_REDIRECT,
+      };
+      res.render('installs', {installs, installUrl, installParams});
     })
     .catch(next),
   );

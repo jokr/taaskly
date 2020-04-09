@@ -2,10 +2,6 @@ extends layout
 
 block content
   h2 All Installs
-  .community-actions
-    - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
-    - const onclick = `window.open('${installUrl}', 'wp', '${dialogFeatures}')`;
-    a.button(onclick=onclick) Install
   table.communities
     thead
       tr
@@ -26,3 +22,15 @@ block content
           td= moment(install.createdAt).fromNow()
           td= install.installType ? install.installType.toLowerCase() : ''
           td= install.permissions ? install.permissions.join(', ').toLowerCase() : ''
+  h2 New Install
+  - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
+  - const onsubmit = `window.open('', 'wp', '${dialogFeatures}'); this.target = 'wp'`;
+  form(action=installUrl onsubmit=onsubmit method="get" style="width: 500px")
+    each val, index in installParams
+      input(type="hidden" name=index value=val)
+    .input-group
+      each val in ["link_unfurling", "bot_mention", "message", "read_user_email", "message_mention"]
+        div.checkbox-inline
+          input.checkbox-input(type='checkbox', name=`permissions[]`, value=val, id=`perm_${val}`)
+          label(for=`perm_${val}`)=val
+    button(type="submit") Install

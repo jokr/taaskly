@@ -96,7 +96,11 @@ textarea {
 }
 
 .input-group {
-  display: flex;
+  margin-bottom: 8px;
+}
+
+.checkbox-inline {
+  margin-right: 8px;
 }
 
 .dropdown {
