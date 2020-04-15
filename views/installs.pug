@@ -12,6 +12,7 @@ block content
         th Created Time
         th Install Type
         th Permissions
+        th Actions
     tbody
       each install in installs
         tr
@@ -22,6 +23,10 @@ block content
           td= moment(install.createdAt).fromNow()
           td= install.installType ? install.installType.toLowerCase() : ''
           td= install.permissions ? install.permissions.join(', ').toLowerCase() : ''
+          td.actions
+            form(action=`/admin/install/${install.pageId}/delete` method="post")
+              button(type="submit") Delete
+
   h2 New Install
   - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
   - const onsubmit = `window.open('', 'wp', '${dialogFeatures}'); this.target = 'wp'`;

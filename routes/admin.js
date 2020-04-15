@@ -90,6 +90,13 @@ router.route('/installs')
     .catch(next),
   );
 
+router.route('/install/:id/delete')
+  .post((req, res, next) => db.models.install
+    .destroy({where: {pageId: req.params.id}})
+    .then(() => res.redirect('/admin/installs'))
+    .catch(next)
+  );
+
 router.route('/users')
   .get((req, res, next) => db.models.user
     .findAll({order: [['createdAt', 'DESC']], include: [{ model: db.models.community, as: 'community' }]})
