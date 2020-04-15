@@ -10,6 +10,7 @@ block content
         th(style="width: 200px") Page ID
         th Page Name
         th Link
+        th Actions
     tbody
       each install in installs
         tr
@@ -17,3 +18,6 @@ block content
           td= install.name
           td
             a(href=install.deeplink target="_blank")= install.prettylink
+          td.actions
+            form(action=`/admin/chat/${install.pageId}/get_started` method="post")
+              button(type="submit") Setup Get Started

@@ -137,6 +137,21 @@ router.route('/chat/')
     .catch(next)
   );
 
+router.route('/chat/:id/get_started')
+  .post((req, res, next) => {
+    db.models.install
+      .findOne({where: {pageId: req.params.id}})
+      .then(install =>
+        graph('me/messenger_profile')
+          .post()
+          .body({get_started: { payload: `get_started_payload_${req.params.id}`}})
+          .token(install.accessToken)
+          .send()
+      )
+      .then(() => res.redirect('/admin/chat'))
+      .catch(next);
+  });
+
 function webhookSubscribe(topic, fields) {
   return graph('app/subscriptions')
     .post()
