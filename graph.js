@@ -72,7 +72,15 @@ class GraphRequest {
     logger.info('sending request', options);
     return request(options)
       .then(result => {
-        logger.info('api response', {code: result.statusCode, body: JSON.stringify(result.body)});
+        logger.info(
+          'api response',
+          {
+            code: result.statusCode,
+            body: result.caseless.get('content-length') > 1000
+              ? '--truncated--'
+              : JSON.stringify(result.body),
+          }
+        );
         return result.body;
       })
       .catch(result => {

@@ -1,0 +1,24 @@
+extends ../layout
+
+block content
+  h2 User
+
+  form(method="post")
+    div(style="margin-bottom: 12px")
+      label(for="count" style="margin-right: 12px") Number of users
+      input(type="number" min="1" max="5000" name="count" id="count")
+    button(type="submit") Create
+
+  p Total of #{users.length} users.
+  table
+    thead
+      tr
+        th(style="width: 200px") ID
+        th Name
+        th Email
+    tbody
+      each user in users
+        tr
+          td= user.id
+          td= user.name
+          td= user.email

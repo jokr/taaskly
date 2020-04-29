@@ -34,7 +34,7 @@ block content
     each val, index in installParams
       input(type="hidden" name=index value=val)
     .input-group
-      each val in ["link_unfurling", "bot_mention", "message", "read_user_email", "message_mention"]
+      each val in ["link_unfurling", "bot_mention", "message", "read_user_email", "message_mention", "list_group_members", "provision_accounts"]
         div.checkbox-inline
           input.checkbox-input(type='checkbox', name=`permissions[]`, value=val, id=`perm_${val}`)
           label(for=`perm_${val}`)=val

@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const express = require('express');
 const logger = require('heroku-logger');
 const {URL, URLSearchParams} = require('url');
+const randomName = require('node-random-name');
 
 const db = require('../db');
 const graph = require('../graph');
@@ -150,6 +151,44 @@ router.route('/chat/:id/get_started')
       )
       .then(() => res.redirect('/admin/chat'))
       .catch(next);
+  });
+
+router.route('/idp/:id/users')
+  .get((req, res, next) => {
+    db.models.install
+      .findOne({where: {pageId: req.params.id}})
+      .then(install =>
+        graph('community/organization_members')
+          .token(install.accessToken)
+          .qs({ fields: 'id,name,email', limit: 5000 })
+          .send()
+      )
+      .then(response => res.render('idp/users', {users: response.data}))
+      .catch(next)
+  })
+  .post((req, res, next) => {
+    db.models.install
+      .findOne({where: {pageId: req.params.id}})
+      .then(install => {
+        const count = parseInt(req.body.count);
+        const requests = Array(count).fill(count).map(() => {
+          const name = randomName();
+          const email = name.replace(/ /g, '').toLowerCase() + '_' + crypto.randomBytes(10).toString('hex') + '@taaskly.com';
+          return graph('community/accounts')
+            .post()
+            .token(install.accessToken)
+            .body({name, email})
+            .send()
+            .catch(err => {
+              logger.error(err);
+            });
+        });
+        return Promise.all(requests);
+      })
+      .then(response => {
+        res.redirect(`/admin/idp/${req.params.id}/users`);
+      })
+      .catch(next)
   });
 
 function webhookSubscribe(topic, fields) {
