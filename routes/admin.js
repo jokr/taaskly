@@ -128,7 +128,7 @@ router.route('/chat/')
     .then(installs => {
       const ref = Math.random().toString(36).slice(4);
       for (const install of installs) {
-        const deeplink = new URL(`https://w.jokr.sb.m.me/${install.pageId}`);
+        const deeplink = new URL(`https://w.m.me/${install.pageId}`);
         install.prettylink = deeplink.toString();
         const params = new URLSearchParams({
           "ref": ref,
