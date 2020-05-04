@@ -86,7 +86,10 @@ router.route('/installs')
         state: state,
         redirect_uri: process.env.APP_REDIRECT,
       };
-      res.render('installs', {installs, installUrl, installParams});
+      const permissions = process.env.PERMISSIONS
+        .split(',')
+        .sort();
+      res.render('installs', {installs, installUrl, installParams, permissions});
     })
     .catch(next),
   );

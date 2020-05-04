@@ -101,6 +101,8 @@ textarea {
 
 .checkbox-inline {
   margin-right: 8px;
+  display: flex;
+  align-items: center;
 }
 
 .dropdown {
@@ -246,4 +248,14 @@ p.document {
 
 .sharedposts-info p {
   margin: 0;
+}
+
+.permissions {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.permissions .checkbox-inline {
+  margin-bottom: 4px;
 }

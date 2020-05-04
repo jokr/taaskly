@@ -30,12 +30,12 @@ block content
   h2 New Install
   - const dialogFeatures = [['width', 800], ['height', 800], ['left', 100], ['top', 100]].map(feature => feature[0] + '=' + feature[1]).join(',')
   - const onsubmit = `window.open('', 'wp', '${dialogFeatures}'); this.target = 'wp'`;
-  form(action=installUrl onsubmit=onsubmit method="get" style="width: 500px")
+  form(action=installUrl onsubmit=onsubmit method="get")
     each val, index in installParams
       input(type="hidden" name=index value=val)
-    .input-group
-      each val in ["link_unfurling", "bot_mention", "message", "read_user_email", "message_mention", "list_group_members", "provision_accounts"]
-        div.checkbox-inline
-          input.checkbox-input(type='checkbox', name=`permissions[]`, value=val, id=`perm_${val}`)
-          label(for=`perm_${val}`)=val
+    .permissions
+      each permission in permissions
+        .checkbox-inline
+          input.checkbox-input(type='checkbox', name=`permissions[]`, value=permission, id=`perm_${permission}`)
+          label(for=`perm_${permission}`)=permission
     button(type="submit") Install
