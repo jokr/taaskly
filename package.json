@@ -19,7 +19,7 @@
     "express-session": "^1.15.6",
     "heroku-logger": "^0.3.0",
     "html-pdf": "^2.2.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "moment": "^2.20.1",
     "morgan": "^1.9.0",
     "node-env-file": "^0.1.8",
